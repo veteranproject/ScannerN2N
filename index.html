@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scanner DO</title>
+  <meta name="theme-color" content="#b91c1c">
+  <style>
+    :root {
+      --red-700:#b91c1c; --red-800:#991b1b; --red-900:#7f1d1d; --red-100:#fee2e2; --red-50:#fef2f2;
+      --ink:#1c1917; --ink-2:#57534e; --ink-3:#a8a29e; --line:#e7e5e4; --bg:#f5f5f4; --card:#fff;
+      --hijau:#166534; --hijau-bg:#dcfce7; --kuning:#92400e; --kuning-bg:#fef3c7;
+    }
+    * { box-sizing:border-box; }
+    [hidden] { display:none !important; }
+    body { margin:0; padding:env(safe-area-inset-top, 0px) 12px 40px; background:var(--bg); color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; font-size:15px; line-height:1.45; }
+    button { font:inherit; cursor:pointer; }
+    button:focus-visible, input:focus-visible { outline:2px solid var(--red-700); outline-offset:1px; }
+    .app { max-width:520px; margin:0 auto; }
+    header { padding:20px 4px 14px; }
+    h1 { margin:0; font-size:1.35rem; font-weight:800; color:var(--red-800); }
+    header p { margin:2px 0 0; color:var(--ink-2); font-size:.88rem; }
+
+    /* Tab tahap */
+    .tabs { display:flex; gap:4px; background:var(--card); border:1px solid var(--line); padding:4px; border-radius:12px; margin-bottom:12px; position:sticky; top:8px; z-index:20; }
+    .tab { flex:1; border:none; padding:10px 8px; border-radius:9px; font-weight:600; background:transparent; color:var(--ink-2); }
+    .tab[aria-pressed="true"] { background:var(--red-700); color:#fff; }
+
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:12px; }
+    .card h2 { margin:0 0 12px; font-size:.95rem; color:var(--red-800); display:flex; align-items:center; gap:8px; }
+    .card h2::before { content:""; width:4px; height:16px; border-radius:2px; background:var(--red-700); }
+    .tag { display:inline-block; margin-left:6px; padding:1px 8px; font-size:.74rem; font-weight:600; color:var(--red-800); background:var(--red-100); border-radius:999px; vertical-align:1px; }
+    .catatan { margin:10px 0 0; font-size:.82rem; line-height:1.45; color:var(--ink-2); }
+
+    /* Ceklist Absolute */
+    .cekgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .cek { display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 6px; font-size:.85rem; font-weight:600; line-height:1.25; text-align:center; color:var(--ink-2); background:#fff; border:1px solid #d6d3d1; border-radius:10px; }
+    .cek i { display:grid; place-items:center; width:26px; height:26px; font-style:normal; font-size:16px; color:transparent; border:2px solid #d6d3d1; border-radius:8px; }
+    .cek small { font-size:.72rem; font-weight:400; color:var(--ink-3); }
+    .cek[aria-pressed="true"] { color:var(--red-900); background:var(--red-50); border-color:var(--red-700); }
+    .cek[aria-pressed="true"] i { color:#fff; background:var(--red-700); border-color:var(--red-700); }
+    .cekbaris { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; font-size:.85rem; color:var(--ink-2); }
+    .cekbaris label { display:flex; align-items:center; gap:6px; cursor:pointer; }
+    input[type="checkbox"] { accent-color:var(--red-700); }
+
+    /* Billing */
+    .tgl { display:block; margin-bottom:10px; font-size:.82rem; font-weight:600; color:var(--ink-2); }
+    .tgl input { display:block; width:100%; margin-top:5px; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #d6d3d1; border-radius:9px; }
+    .katgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .kat { padding:12px 6px; font-weight:600; color:var(--ink-2); background:#fff; border:1px solid #d6d3d1; border-radius:10px; }
+    .kat[aria-pressed="true"] { color:var(--red-900); background:var(--red-50); border-color:var(--red-700); box-shadow:inset 0 0 0 1px var(--red-700); }
+
+    /* Kamera */
+    #kamera { position:relative; height:160px; overflow:hidden; background:var(--ink); border-radius:12px; cursor:pointer; }
+    #reader, #reader__scan_region { width:100%; height:100% !important; min-height:0 !important; border:none !important; }
+    #reader video { display:block; width:100% !important; height:100% !important; object-fit:cover; }
+    #reader #qr-shaded-region { border-color:rgba(28, 25, 23, .5) !important; }
+    #reader #qr-shaded-region div { background-color:#fca5a5 !important; }
+    #pesanKamera { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:14px; overflow:auto; text-align:center; font-size:.85rem; line-height:1.45; color:#fff; background:rgba(28, 25, 23, .85); }
+    .garis { position:absolute; left:6%; right:6%; top:50%; height:2px; opacity:0; pointer-events:none; background:#fecaca; box-shadow:0 0 8px #f87171; }
+    #kamera.kedip, #panelAlat.kedip { box-shadow:inset 0 0 0 4px #fca5a5; }
+    #kamera.aktif .garis { opacity:1; animation:sapu 1.8s ease-in-out infinite alternate; }
+    @keyframes sapu { from { top:22%; } to { top:78%; } }
+    @media (prefers-reduced-motion: reduce) { #kamera.aktif .garis { animation:none; } }
+
+    /* Alat scanner USB */
+    .alat { display:flex; flex-direction:column; align-items:center; gap:4px; padding:24px 14px; text-align:center; background:var(--red-50); border:1px dashed #f87171; border-radius:12px; }
+    .alat strong { font-size:1.05rem; color:var(--red-800); }
+    .alat span { font-size:.88rem; color:var(--ink-2); }
+
+    .baris { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px; }
+    .chip { padding:6px 12px; border-radius:999px; font-size:.85rem; font-weight:600; }
+    #jumlah { background:var(--red-100); color:var(--red-800); }
+    #antrean { background:var(--kuning-bg); color:var(--kuning); }
+    .kecil { padding:6px 12px; border-radius:999px; border:1px solid var(--red-700); background:#fff; color:var(--red-800); font-size:.85rem; font-weight:600; }
+    #btnCara { margin-left:auto; }
+    #pesan { min-height:20px; margin:8px 0 0; font-size:.9rem; text-align:center; }
+    #pesan.err { color:var(--red-700); }
+    #pesan.ok { color:var(--hijau); }
+
+    /* Input manual */
+    .manual { display:flex; gap:8px; margin-top:10px; }
+    .manual input { flex:1; min-width:0; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #d6d3d1; border-radius:9px; }
+    .manual button { padding:10px 20px; border:none; background:var(--red-700); color:#fff; border-radius:10px; font-weight:700; }
+    .manual button:hover { background:var(--red-800); }
+
+    /* Hasil scan */
+    #kosong { margin:0; font-size:.9rem; color:var(--ink-2); }
+    #daftar { list-style:none; margin:0; padding:0; }
+    #daftar li { display:flex; gap:10px; justify-content:space-between; align-items:flex-start; padding:9px 0; border-top:1px solid var(--line); }
+    #daftar li:first-child { border-top:none; padding-top:0; }
+    .kode { font-weight:700; word-break:break-all; }
+    .ket { margin-top:2px; font-size:.82rem; color:var(--ink-2); }
+    .lencana { flex:none; padding:3px 10px; font-size:.78rem; font-weight:600; border-radius:999px; white-space:nowrap; }
+    .lencana.ok { color:var(--hijau); background:var(--hijau-bg); }
+    .lencana.sudah, .lencana.kurang, .lencana.periksa { color:var(--kuning); background:var(--kuning-bg); }
+    .lencana.tidak, .lencana.gagal { color:var(--red-800); background:var(--red-100); }
+    .lencana.proses, .lencana.antre { color:var(--ink-2); background:var(--bg); }
+
+    /* Pop-up cara scan */
+    .modal { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(28, 25, 23, .6); }
+    .kotak { width:100%; max-width:400px; padding:20px; background:#fff; border-radius:14px; }
+    .kotak h3 { margin:0 0 6px; font-size:1.05rem; color:var(--red-800); }
+    .kotak p { margin:0 0 12px; font-size:.9rem; color:var(--ink-2); }
+    .kotak p.galat { color:var(--red-700); }
+    .kotak button { display:block; width:100%; margin-top:8px; padding:12px; font-weight:600; color:var(--red-800); background:#fff; border:1px solid #d6d3d1; border-radius:10px; }
+    .kotak button small { display:block; margin-top:2px; font-size:.78rem; font-weight:400; color:var(--ink-2); }
+    .kotak button.terakhir { color:#fff; background:var(--red-700); border-color:var(--red-700); }
+    .kotak button.terakhir small { color:#fecaca; }
+    #mTutup { color:var(--ink-2); background:transparent; border-color:transparent; font-weight:500; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Scanner DO</h1>
+    <p>Scan nomor DO, penerimaan, POD, dan released billing tercatat otomatis.</p>
+  </header>
+
+  <div class="tabs" role="group" aria-label="Tahap scan">
+    <button type="button" class="tab" id="tStore" aria-pressed="true">Storeman</button>
+    <button type="button" class="tab" id="tAbs" aria-pressed="false">Absolute</button>
+    <button type="button" class="tab" id="tBill" aria-pressed="false">Billing</button>
+  </div>
+
+  <div class="card" id="panelCek" hidden>
+    <h2>Kelengkapan dokumen</h2>
+    <div class="cekgrid">
+      <button type="button" class="cek" data-k="sj" aria-pressed="false"><i aria-hidden="true">✓</i>Surat Jalan<small>tekan 1</small></button>
+      <button type="button" class="cek" data-k="ttd" aria-pressed="false"><i aria-hidden="true">✓</i>TTD &amp; Stempel<small>tekan 2</small></button>
+    </div>
+    <div class="cekbaris">
+      <button type="button" class="kecil" id="cekSemua">Lengkap semua (3)</button>
+      <label><input type="checkbox" id="pertahankan"> Pertahankan centang</label>
+    </div>
+    <p class="catatan">Pintasan keyboard: 1 = hanya Surat Jalan, 2 = hanya TTD &amp; Stempel, 3 = keduanya lengkap. Atau ketuk tombolnya. Pilih dulu, lalu scan. Kalau ada yang kurang, otomatis tertulis di Keterangan dan kolom POD tidak tercentang. Scan ulang nomor itu setelah dilengkapi.</p>
+  </div>
+
+  <div class="card" id="panelBilling" hidden>
+    <h2>Data released billing</h2>
+    <label class="tgl">Tanggal
+      <input type="date" id="tanggal" autocomplete="off">
+    </label>
+    <div class="katgrid" role="group" aria-label="Kategori">
+      <button type="button" class="kat" data-v="Kredit" aria-pressed="false">Kredit</button>
+      <button type="button" class="kat" data-v="COD 1.5%" aria-pressed="false">COD 1.5%</button>
+      <button type="button" class="kat" data-v="Batal COD" aria-pressed="false">Batal COD</button>
+      <button type="button" class="kat" data-v="COD" aria-pressed="false">COD</button>
+    </div>
+    <p class="catatan">Pilih tanggal dan kategori dulu, lalu scan. Setiap scan menambah satu baris di sheet Released Billing memakai pilihan ini, sampai Anda menggantinya. Nomor Billing (kolom E) tidak diisi oleh scanner.</p>
+  </div>
+
+  <div class="card">
+    <div id="kamera">
+      <div id="reader"></div>
+      <div id="pesanKamera">Ketuk di sini untuk mengaktifkan kamera</div>
+      <div class="garis"></div>
+    </div>
+    <div id="panelAlat" class="alat" hidden>
+      <strong>Alat scanner siap</strong>
+      <span>Sambungkan kabel USB, lalu langsung scan barcode.</span>
+    </div>
+    <div class="baris">
+      <span class="chip" id="jumlah">0 discan</span>
+      <span class="chip" id="antrean" hidden></span>
+      <button type="button" class="kecil" id="btnFoto" hidden>Foto barcode</button>
+      <button type="button" class="kecil" id="btnSuara">Suara: nyala</button>
+      <button type="button" class="kecil" id="btnCara">Ganti cara scan</button>
+      <input type="file" id="fileFoto" accept="image/*" capture="environment" hidden>
+    </div>
+    <p id="pesan" role="status" aria-live="polite"></p>
+    <form class="manual" id="formManual" autocomplete="off">
+      <input type="text" id="manual" placeholder="Ketik nomor DO" aria-label="Nomor DO">
+      <button type="submit">Proses</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Hasil scan</h2>
+    <p id="kosong">Belum ada nomor yang discan.</p>
+    <ul id="daftar"></ul>
+  </div>
+</div>
+
+<div id="modalCara" class="modal" role="dialog" aria-modal="true" aria-labelledby="mJudul" hidden>
+  <div class="kotak">
+    <h3 id="mJudul">Pilih cara scan</h3>
+    <p id="mTeks">Pilih salah satu. Pilihan bisa diganti kapan saja lewat tombol Ganti cara scan.</p>
+    <button type="button" id="mKamera">Kamera<small>Pindai barcode lewat kamera HP atau laptop</small></button>
+    <button type="button" id="mAlat">Alat scanner USB<small>Sambungkan kabel, lalu scan langsung</small></button>
+    <button type="button" id="mKetik">Ketik manual<small>Ketik nomor DO sendiri</small></button>
+    <button type="button" id="mTutup">Tutup</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  // Ganti dengan URL Web App Apps Script (berakhiran /exec)
+  const API_URL = 'https://script.google.com/macros/s/AKfycbx4DdrYO1wRmy1kkA8oGRrYfMVUvRrGizkAgfR06MZ7i-5mAMUNHN1yKJQBTlDvxMxCFQ/exec';
+
+  const $ = (id) => document.getElementById(id);
+  const TEKS_MODAL = 'Pilih salah satu. Pilihan bisa diganti kapan saja lewat tombol Ganti cara scan.';
+  let daftar = [];          // hasil scan sesi ini, terbaru di atas: {kode, status, ket}
+  let scanner = null, scannerJalan = false;
+  let kunciTerakhir = '', waktuTerakhir = 0;
+
+  // ---- Penyimpanan lokal dan nama petugas ----
+  const simpanLokal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const bacaLokal = (k) => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
+
+  // Nama petugas ditanyakan sekali, lalu diingat di browser ini (dicatat di kolom User)
+  let namaCache = bacaLokal('nama');
+  function ambilNama() {
+    if (!namaCache) {
+      namaCache = (prompt('Masukkan nama Anda') || '').trim() || '-';
+      simpanLokal('nama', namaCache === '-' ? '' : namaCache);
+    }
+    return namaCache;
+  }
+
+  async function api(action, data) {
+    const user = ambilNama();
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 20000);
+    try {
+      // Tanpa header khusus agar browser tidak mengirim preflight (CORS) ke Apps Script
+      const res = await fetch(API_URL, { method: 'POST', signal: ctl.signal,
+        body: JSON.stringify(Object.assign({ action: action, user: user }, data)) });
+      return await res.json();
+    } finally { clearTimeout(timer); }
+  }
+
+  // ---- Tahap scan: storeman, absolute, billing ----
+  const NAMA_TAHAP = { storeman: 'Storeman', absolute: 'Absolute', billing: 'Billing' };
+  let tahap = ['storeman', 'absolute', 'billing'].includes(bacaLokal('tahap')) ? bacaLokal('tahap') : 'storeman';
+  function setTahap(t, simpan) {
+    tahap = t;
+    if (simpan) simpanLokal('tahap', t);
+    $('tStore').setAttribute('aria-pressed', String(t === 'storeman'));
+    $('tAbs').setAttribute('aria-pressed', String(t === 'absolute'));
+    $('tBill').setAttribute('aria-pressed', String(t === 'billing'));
+    $('panelCek').hidden = t !== 'absolute';
+    $('panelBilling').hidden = t !== 'billing';
+    pesan('');
+  }
+  $('tStore').addEventListener('click', () => setTahap('storeman', true));
+  $('tAbs').addEventListener('click', () => setTahap('absolute', true));
+  $('tBill').addEventListener('click', () => setTahap('billing', true));
+
+  // ---- Ceklist kelengkapan: Surat Jalan dan TTD & Stempel ----
+  const kosongCek = () => ({ sj: false, ttd: false });
+  let cek = kosongCek();
+  let pertahankan = bacaLokal('pertahankan') === '1';
+
+  function renderCek() {
+    document.querySelectorAll('.cek').forEach((b) => b.setAttribute('aria-pressed', String(cek[b.dataset.k])));
+  }
+  document.querySelectorAll('.cek').forEach((b) => b.addEventListener('click', () => { cek[b.dataset.k] = !cek[b.dataset.k]; renderCek(); }));
+  $('cekSemua').addEventListener('click', () => { cek = { sj: true, ttd: true }; renderCek(); });
+  // Pintasan keyboard tahap Absolute (angka atas maupun numpad): 1 = Surat Jalan, 2 = TTD & Stempel, 3 = keduanya
+  const PINTAS = { '1': { sj: true, ttd: false }, '2': { sj: false, ttd: true }, '3': { sj: true, ttd: true } };
+  let timerPintas = null;
+  $('pertahankan').addEventListener('change', (e) => { pertahankan = e.target.checked; simpanLokal('pertahankan', pertahankan ? '1' : '0'); });
+
+  // ---- Released Billing: tanggal dan kategori ----
+  // Sengaja tidak disimpan antar sesi: tanggal yang basi akan salah tercatat tanpa terlihat.
+  let kategori = '';
+  const fmtTgl = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; };
+  document.querySelectorAll('.kat').forEach((b) => b.addEventListener('click', () => {
+    kategori = b.dataset.v;
+    document.querySelectorAll('.kat').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    pesan('');
+  }));
+  // Setelah memilih tanggal, lepaskan fokus supaya ketikan alat scanner USB tidak mengubah tanggal
+  $('tanggal').addEventListener('change', () => { $('tanggal').blur(); pesan(''); });
+
+  // ---- Tampilan ----
+  function pesan(teks, jenis) { $('pesan').textContent = teks || ''; $('pesan').className = jenis || ''; }
+
+  const LABEL = { proses: 'Memproses', ok: 'Diterima', sudah: 'Sudah diterima', kurang: 'Belum lengkap', periksa: 'Periksa', tidak: 'Tidak ditemukan', antre: 'Menunggu kirim', gagal: 'Gagal' };
+  const labelStatus = (d) => {
+    if (d.tahap === 'billing') return d.status === 'ok' ? 'Tercatat' : d.status === 'sudah' ? 'Sudah tercatat' : LABEL[d.status];
+    return (d.status === 'ok' && d.tahap === 'absolute') ? 'Lengkap' : (d.status === 'sudah' && d.tahap === 'absolute') ? 'Sudah lengkap' : LABEL[d.status];
+  };
+  const sama = (t, k) => (d) => (d.tahap || 'storeman') === t && d.kode.toUpperCase() === k.toUpperCase();
+
+  function render() {
+    $('kosong').hidden = daftar.length > 0;
+    $('jumlah').textContent = daftar.length + ' discan';
+    $('daftar').replaceChildren(...daftar.map((d) => {
+      const li = document.createElement('li');
+      li.className = d.status;
+      const kiri = document.createElement('div');
+      const kode = document.createElement('div'); kode.className = 'kode'; kode.textContent = d.kode;
+      const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = NAMA_TAHAP[d.tahap || 'storeman'];
+      kode.append(tag);
+      kiri.append(kode);
+      if (d.ket) { const k = document.createElement('div'); k.className = 'ket'; k.textContent = d.ket; kiri.append(k); }
+      const l = document.createElement('span'); l.className = 'lencana ' + d.status; l.textContent = labelStatus(d);
+      li.append(kiri, l);
+      return li;
+    }));
+  }
+
+  // Menerjemahkan hasil dari server ke tampilan
+  function terapkan(item, h) {
+    if (!h) { item.status = 'gagal'; item.ket = 'Tidak ada jawaban dari server.'; return; }
+    const t = h.tahap || item.tahap;
+    item.status = h.status;
+
+    if (t === 'billing') {
+      const info = (h.kategori || '') + (h.tanggal ? ', ' + h.tanggal : '');
+      if (h.status === 'ok') item.ket = info;
+      else if (h.status === 'periksa') item.ket = info + '. Tersimpan, tetapi nomor ini tidak ada di Master Data. Periksa kembali nomornya.';
+      else if (h.status === 'sudah') item.ket = 'Sudah tercatat: ' + info + (h.user ? ', oleh ' + h.user : '');
+      else item.ket = h.pesan || 'Data tidak valid.';
+      return;
+    }
+
+    const abs = t === 'absolute';
+    if (h.status === 'ok') {
+      item.ket = abs ? (h.baris > 1 ? 'Lengkap, POD tercentang di ' + h.baris + ' baris' : 'Lengkap, POD tercentang')
+        : (h.baris > 1 ? h.baris + ' baris diperbarui' : 'Tanggal penerimaan tercatat');
+    } else if (h.status === 'kurang') {
+      item.ket = 'Kurang: ' + (h.kurang || []).join(', ') + '. POD tidak tercentang. Scan ulang setelah dilengkapi.';
+    } else if (h.status === 'sudah') {
+      item.ket = (abs ? 'Sudah lengkap, oleh ' : 'Oleh ') + h.user + ', ' + h.waktu;
+    } else {
+      item.ket = 'Nomor ini tidak ada di kolom NO DOCUMENT';
+    }
+  }
+
+  // ---- Pengiriman dan antrean offline ----
+  let antrean = (() => { try { return JSON.parse(localStorage.getItem('antrean_do') || '[]'); } catch (e) { return []; } })();
+  function simpanAntrean() {
+    simpanLokal('antrean_do', JSON.stringify(antrean));
+    $('antrean').hidden = !antrean.length;
+    $('antrean').textContent = antrean.length + ' menunggu kirim';
+  }
+
+  let sedangBilas = false, timerUlang = null;
+
+  function tandaiAntre(paket, ket) {
+    paket.forEach((p) => {
+      const d = daftar.find(sama(p.tahap || 'storeman', p.kode));
+      if (d && d.status === 'proses') { d.status = 'antre'; d.ket = ket; }
+    });
+    render();
+  }
+  function jadwalUlang() {
+    if (!timerUlang) timerUlang = setTimeout(() => { timerUlang = null; bilasAntrean(); }, 8000);
+  }
+
+  // Kirim satu kelompok ke satu aksi. Berhasil: kelompok keluar dari antrean. Gagal: tetap di antrean.
+  async function kirimGrup(grup, aksi) {
+    if (!grup.length) return true;
+    try {
+      const res = await api(aksi, { items: grup });
+      if (!res || !res.ok) {
+        tandaiAntre(grup, (res && res.message) || 'Gagal memproses, dicoba lagi otomatis.');
+        return false;
+      }
+      antrean = antrean.filter((x) => !grup.includes(x));
+      simpanAntrean();
+      (res.hasil || []).forEach((h) => {
+        const t = h.tahap || 'storeman';
+        let item = daftar.find(sama(t, h.kode));
+        if (!item) { item = { kode: h.kode, tahap: t }; daftar.unshift(item); }
+        terapkan(item, h);
+      });
+      render();
+      bunyiHasil(res.hasil);
+      return true;
+    } catch (e) {
+      tandaiAntre(grup, 'Tidak ada sinyal. Dikirim otomatis nanti.');
+      return false;
+    }
+  }
+
+  // Semua scan masuk antrean. Hanya satu pengiriman berjalan sekaligus, dan setiap pengiriman
+  // membawa semua scan yang menumpuk, jadi scan berikutnya tidak perlu menunggu hasil sebelumnya.
+  // Storeman/Absolute dikirim lewat aksi 'terima', Billing lewat aksi 'billing' (dua kelompok yang berdiri sendiri,
+  // jadi satu kelompok yang gagal tidak menahan yang lain).
+  async function bilasAntrean() {
+    if (sedangBilas) return;
+    sedangBilas = true;
+    try {
+      while (antrean.length) {
+        const master = antrean.filter((x) => x.tahap !== 'billing').slice(0, 25);
+        const bill = antrean.filter((x) => x.tahap === 'billing').slice(0, 25);
+        const a = await kirimGrup(master, 'terima');
+        const b = await kirimGrup(bill, 'billing');
+        if (!a || !b) { jadwalUlang(); break; }
+      }
+    } finally { sedangBilas = false; }
+  }
+
+  // ---- Suara ----
+  // Browser hanya mengizinkan suara setelah ada ketukan/tombol dari pengguna, jadi audio "dibuka" pada interaksi pertama.
+  // Tanpa ini, scan lewat kamera bisa senyap karena tidak ada interaksi tepat sebelum bunyi.
+  let suaraNyala = bacaLokal('suara') !== '0';
+  let audio = null;
+  function siapAudio() {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state === 'suspended') audio.resume();
+    } catch (e) {}
+  }
+  ['pointerdown', 'touchstart', 'keydown'].forEach((ev) => document.addEventListener(ev, siapAudio, { passive: true }));
+
+  // Tiap nada: [frekuensi Hz, mulai (detik), durasi (detik), bentuk gelombang]
+  const SUARA = {
+    scan:      [[1100, 0, 0.09, 'square']],                                  // barcode terbaca
+    sukses:    [[660, 0, 0.10, 'sine'], [990, 0.11, 0.16, 'sine']],          // tersimpan di sheet (naik)
+    peringatan:[[520, 0, 0.12, 'triangle'], [520, 0.17, 0.12, 'triangle']],  // tersimpan tetapi perlu perhatian / sudah ada
+    galat:     [[220, 0, 0.32, 'sawtooth']]                                  // ditolak atau gagal
+  };
+  function bunyi(nama) {
+    if (!suaraNyala) return;
+    siapAudio();
+    if (!audio) return;
+    try {
+      const t0 = audio.currentTime;
+      SUARA[nama].forEach((n) => {
+        const o = audio.createOscillator(), g = audio.createGain();
+        const a = t0 + n[1];
+        o.type = n[3]; o.frequency.value = n[0];
+        g.gain.setValueAtTime(0.0001, a);
+        g.gain.exponentialRampToValueAtTime(0.3, a + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, a + n[2]);
+        o.connect(g); g.connect(audio.destination);
+        o.start(a); o.stop(a + n[2] + 0.03);
+      });
+    } catch (e) {}
+  }
+  // Satu bunyi per kiriman: yang terburuk menang (galat > peringatan > sukses)
+  function bunyiHasil(hasil) {
+    const st = (hasil || []).map((h) => h.status);
+    if (!st.length) return;
+    if (st.some((s) => s === 'tidak' || s === 'gagal')) bunyi('galat');
+    else if (st.some((s) => s === 'sudah' || s === 'kurang' || s === 'periksa')) bunyi('peringatan');
+    else bunyi('sukses');
+  }
+  function setSuara(nyala) {
+    suaraNyala = nyala;
+    simpanLokal('suara', nyala ? '1' : '0');
+    $('btnSuara').textContent = nyala ? 'Suara: nyala' : 'Suara: mati';
+    if (nyala) bunyi('scan');
+  }
+  $('btnSuara').addEventListener('click', () => setSuara(!suaraNyala));
+
+  // Penolakan lokal (duplikat, tanggal/kategori kosong): bunyi galat hanya sekali per nomor,
+  // supaya barcode yang masih di depan kamera tidak membunyikan alarm tiap 3 detik.
+  let galatKunci = '', galatWaktu = 0;
+  function tolak(teks, kunci) {
+    pesan(teks, 'err');
+    const n = Date.now();
+    if (kunci !== galatKunci || n - galatWaktu > 10000) { bunyi('galat'); galatKunci = kunci; galatWaktu = n; }
+  }
+
+  // Bunyi pendek dan kedipan bingkai: tanda scan masuk, langsung arahkan ke barcode berikutnya
+  function tandaScan() {
+    if (navigator.vibrate) navigator.vibrate(80);
+    bunyi('scan');
+    const el = $('kamera').hidden ? $('panelAlat') : $('kamera');
+    el.classList.add('kedip');
+    setTimeout(() => el.classList.remove('kedip'), 250);
+  }
+
+  // ---- Memproses nomor DO ----
+  function proses(teks) {
+    const kode = String(teks).trim();
+    if (!kode) return;
+
+    // Billing: tanggal dan kategori wajib dipilih dulu. Nilainya diambil saat scan, bukan saat antrean terkirim.
+    let tanggalIso = '', kat = '';
+    if (tahap === 'billing') {
+      tanggalIso = $('tanggal').value;
+      kat = kategori;
+      if (!tanggalIso) return tolak('Pilih tanggal dulu sebelum scan Billing.', 'pilihan');
+      if (!kat) return tolak('Pilih kategori dulu sebelum scan Billing.', 'pilihan');
+    }
+
+    const sekarang = Date.now();
+    const kunci = tahap + '|' + kode.toUpperCase();
+    if (kunci === kunciTerakhir && sekarang - waktuTerakhir < 3000) return;   // barcode yang sama masih di depan kamera
+    kunciTerakhir = kunci; waktuTerakhir = sekarang;
+
+    // Nomor yang sudah discan ditolak, kecuali yang belum lengkap (boleh discan ulang)
+    const ada = daftar.find(sama(tahap, kode));
+    if (ada && ada.status !== 'kurang') return tolak(kode + ' sudah discan (' + NAMA_TAHAP[tahap] + ') pada sesi ini.', kunci);
+    if (ada) daftar.splice(daftar.indexOf(ada), 1);
+
+    tandaScan();
+    pesan('');
+    daftar.unshift({ kode: kode, tahap: tahap, status: 'proses', ket: tahap === 'billing' ? kat + ', ' + fmtTgl(tanggalIso) : '' });
+    render();
+
+    const butir = { kode: kode, waktu: sekarang, tahap: tahap };
+    if (tahap === 'absolute') butir.cek = Object.assign({}, cek);   // kelengkapan dokumen saat scan
+    if (tahap === 'billing') { butir.tanggal = tanggalIso; butir.kategori = kat; }
+    antrean.push(butir);
+    simpanAntrean();
+    bilasAntrean();
+
+    if (tahap === 'absolute' && !pertahankan) { cek = kosongCek(); renderCek(); }   // centang kembali kosong untuk dokumen berikutnya
+  }
+
+  $('formManual').addEventListener('submit', (e) => {
+    e.preventDefault();
+    proses($('manual').value);
+    $('manual').value = '';
+  });
+
+  // ---- Kamera ----
+  function buatScanner() {
+    if (scanner) return scanner;
+    const F = Html5QrcodeSupportedFormats;
+    scanner = new Html5Qrcode('reader', {
+      formatsToSupport: [F.CODE_128, F.CODE_39, F.CODE_93, F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.ITF, F.CODABAR],
+      useBarCodeDetectorIfSupported: true, verbose: false });
+    return scanner;
+  }
+
+  function mulaiScanner() {
+    if (!window.Html5Qrcode) { $('pesanKamera').hidden = false; $('pesanKamera').textContent = 'Library scanner gagal dimuat. Periksa koneksi internet.'; return; }
+    buatScanner().start({ facingMode: 'environment' },
+      { fps: 15, qrbox: (w, h) => ({ width: Math.floor(w * 0.92), height: Math.max(60, Math.floor(h * 0.8)) }) },
+      proses, () => {})
+      .then(() => { scannerJalan = true; $('pesanKamera').hidden = true; $('kamera').classList.add('aktif'); })
+      .catch((err) => {
+        $('pesanKamera').hidden = false;
+        $('pesanKamera').textContent = 'Kamera langsung tidak bisa diakses (' + String(err) + '). Gunakan Foto barcode atau ketik nomor.';
+        $('btnFoto').hidden = false;
+        bukaModal(pesanError(err), true);
+      });
+  }
+
+  function hentikanScanner() {
+    if (!scannerJalan || !scanner) return;
+    scannerJalan = false;
+    scanner.stop().then(() => {
+      $('kamera').classList.remove('aktif');
+      $('pesanKamera').hidden = false;
+      $('pesanKamera').textContent = 'Ketuk di sini untuk mengaktifkan kamera';
+    }).catch(() => {});
+  }
+
+  function pesanError(err) {
+    const s = ((err && err.name) || '') + ' ' + String(err && err.message ? err.message : err);
+    const kode = (err && err.name) || String(err);
+    if (/NotAllowed|Permission/i.test(s)) return 'Izin kamera ditolak atau diblokir (' + kode + '). Ketuk ikon di kiri alamat URL > Izin > Kamera > Izinkan, muat ulang halaman, lalu coba lagi. Atau pilih Alat scanner USB / Ketik manual.';
+    if (/NotFound|Requested device not found/i.test(s)) return 'Kamera tidak ditemukan di perangkat ini (' + kode + '). Pilih Alat scanner USB atau Ketik manual.';
+    if (/NotReadable|TrackStart/i.test(s)) return 'Kamera sedang dipakai aplikasi lain (' + kode + '). Tutup aplikasi itu lalu coba lagi.';
+    return 'Kamera gagal dibuka (' + kode + '). Pilih Alat scanner USB atau Ketik manual.';
+  }
+
+  // ---- Cara scan: kamera, alat scanner USB, ketik manual ----
+  let cara = bacaLokal('cara');   // 'kamera' | 'alat' | 'ketik' | ''
+
+  function setCara(m, simpan) {
+    cara = m;
+    if (simpan) simpanLokal('cara', m);
+    $('kamera').hidden = m !== 'kamera';
+    $('panelAlat').hidden = m !== 'alat';
+    if (m !== 'kamera') hentikanScanner();
+    pesan('');
+    if (m === 'ketik') $('manual').focus();
+    else if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  }
+
+  const bukaModal = (teks, galat) => {
+    $('mTeks').textContent = teks || TEKS_MODAL;
+    $('mTeks').className = galat ? 'galat' : '';
+    const terakhir = { kamera: 'mKamera', alat: 'mAlat', ketik: 'mKetik' }[cara];
+    ['mKamera', 'mAlat', 'mKetik'].forEach((id) => $(id).classList.toggle('terakhir', id === terakhir));
+    $('modalCara').hidden = false;
+    $('mKamera').focus();
+  };
+  const tutupModal = () => { $('modalCara').hidden = true; };
+
+  // Pilihan 1: Kamera. Dipanggil dari ketukan tombol, sehingga browser boleh menampilkan pop-up izin
+  $('mKamera').addEventListener('click', async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      $('btnFoto').hidden = false;
+      return bukaModal('Browser ini tidak mengizinkan akses kamera langsung (perlu HTTPS). Pilih Alat scanner USB atau Ketik manual, atau pakai tombol Foto barcode.', true);
+    }
+    try {
+      (await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })).getTracks().forEach((t) => t.stop());
+    } catch (err) { $('btnFoto').hidden = false; return bukaModal(pesanError(err), true); }
+    tutupModal();
+    setCara('kamera', true);     // tampilkan area kamera dulu, baru mulai
+    mulaiScanner();
+  });
+
+  // Pilihan 2: Alat scanner USB
+  $('mAlat').addEventListener('click', () => { tutupModal(); setCara('alat', true); pesan('Alat scanner siap. Arahkan ke barcode dan tekan pemicu.', 'ok'); });
+
+  // Pilihan 3: Ketik manual
+  $('mKetik').addEventListener('click', () => { tutupModal(); setCara('ketik', true); });
+
+  $('mTutup').addEventListener('click', tutupModal);
+  $('btnCara').addEventListener('click', () => bukaModal());
+  $('kamera').addEventListener('click', () => { if (!scannerJalan) bukaModal(); });
+
+  // ---- Alat scanner USB (bekerja seperti keyboard: ketik cepat lalu Enter) ----
+  // Ditangkap di mana saja, tanpa perlu klik kolom input. Kalau terdeteksi dari cara lain, cara otomatis pindah ke alat.
+  let buf = '', tMulai = 0, tBuf = 0;
+  document.addEventListener('keydown', (e) => {
+    if (e.target === $('manual') || e.ctrlKey || e.metaKey || e.altKey) return;   // kolom input ditangani form di atas
+    // Kolom tanggal: cegah huruf/angka dari alat scanner mengubah tanggal yang sudah dipilih (kalender tetap bisa dipakai)
+    if (e.target === $('tanggal') && e.key.length === 1) e.preventDefault();
+    const now = Date.now();
+    const jeda = now - tBuf;
+    // Pintasan 1/2/3 hanya berlaku untuk tekanan tunggal. Angka di dalam barcode dari alat scanner datang beruntun
+    // (jeda pendek sebelum dan sesudahnya), jadi ditunda sebentar dan dibatalkan kalau ada tombol lain menyusul.
+    clearTimeout(timerPintas);
+    if (tahap === 'absolute' && $('modalCara').hidden && jeda > 150 && PINTAS[e.key]) {
+      const pilih = PINTAS[e.key];
+      timerPintas = setTimeout(() => { cek = Object.assign({}, pilih); renderCek(); }, 160);
+    }
+    if (jeda > 150) { buf = ''; tMulai = now; }   // jeda panjang = ketikan manusia
+    tBuf = now;
+    if (e.key === 'Enter') {
+      const rata = buf.length ? (now - tMulai) / buf.length : 999;
+      if (buf.length >= 6 && rata < 60) {               // cepat = alat, bukan manusia
+        e.preventDefault();                              // juga mencegah Enter menekan tombol yang sedang fokus
+        tutupModal();
+        if (cara !== 'alat') setCara('alat', true);
+        proses(buf);
+      }
+      buf = '';
+    } else if (e.key.length === 1) buf += e.key;
+  });
+
+  // ---- Cadangan: foto barcode lewat aplikasi kamera bawaan HP ----
+  $('btnFoto').addEventListener('click', () => $('fileFoto').click());
+  $('fileFoto').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file || !window.Html5Qrcode) return;
+    pesan('Membaca foto...');
+    buatScanner().scanFile(file, false)
+      .then((teks) => { kunciTerakhir = ''; proses(teks); })
+      .catch(() => pesan('Barcode tidak terbaca. Foto lebih dekat, tegak lurus, dan pastikan barcode utuh serta fokus.', 'err'));
+  });
+
+  // ---- Mulai ----
+  window.addEventListener('load', () => {
+    render();
+    simpanAntrean();
+    setTahap(tahap);
+    renderCek();
+    $('pertahankan').checked = pertahankan;
+    $('btnSuara').textContent = suaraNyala ? 'Suara: nyala' : 'Suara: mati';
+    bukaModal();       // pop-up pilihan cara scan selalu tampil saat halaman dibuka
+    ambilNama();
+    bilasAntrean();
+  });
+  window.addEventListener('online', bilasAntrean);
+</script>
+</body>
+</html>

@@ -2,13 +2,14 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Scanner DO</title>
-  <meta name="theme-color" content="#b91c1c">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Scanner N2N Proses</title>
+  <meta name="theme-color" content="#4a46b9">
   <style>
     :root {
-      --red-700:#b91c1c; --red-800:#991b1b; --red-900:#7f1d1d; --red-100:#fee2e2; --red-50:#fef2f2;
-      --ink:#1c1917; --ink-2:#57534e; --ink-3:#a8a29e; --line:#e7e5e4; --bg:#f5f5f4; --card:#fff;
+      --p-900:#2b2873; --p-800:#322f85; --p-700:#3d39a3; --p-600:#4a46b9; --p-300:#a78bdb; --p-200:#cdbff0; --p-100:#e9e6fb; --p-50:#f4f3fd;
+      --ink:#1d1b3a; --ink-2:#55527a; --ink-3:#9a98b8; --line:#e3e1f3; --bg:#f2f1fa; --card:#fff;
+      --merah:#b42334; --merah-bg:#fde8ea;
       --hijau:#166534; --hijau-bg:#dcfce7; --kuning:#92400e; --kuning-bg:#fef3c7;
     }
     * { box-sizing:border-box; }
@@ -16,74 +17,91 @@
     body { margin:0; padding:env(safe-area-inset-top, 0px) 12px 40px; background:var(--bg); color:var(--ink);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; font-size:15px; line-height:1.45; }
     button { font:inherit; cursor:pointer; }
-    button:focus-visible, input:focus-visible { outline:2px solid var(--red-700); outline-offset:1px; }
+    button:focus-visible, input:focus-visible { outline:2px solid var(--p-600); outline-offset:2px; }
     .app { max-width:520px; margin:0 auto; }
-    header { padding:20px 4px 14px; }
-    h1 { margin:0; font-size:1.35rem; font-weight:800; color:var(--red-800); }
-    header p { margin:2px 0 0; color:var(--ink-2); font-size:.88rem; }
+
+    /* Header bergaya diagonal */
+    header { position:relative; overflow:hidden; margin:12px 0; padding:24px 20px 22px; color:#fff; border-radius:18px;
+      background:linear-gradient(135deg, var(--p-600), var(--p-800)); }
+    header::before, header::after { content:""; position:absolute; pointer-events:none; transform:rotate(30deg); }
+    header::before { width:280px; height:64px; right:-70px; top:6px; background:linear-gradient(90deg, rgba(167,139,219,0), rgba(167,139,219,.6)); }
+    header::after { width:200px; height:26px; right:-30px; top:84px; background:linear-gradient(90deg, rgba(167,139,219,0), rgba(167,139,219,.35)); }
+    header > * { position:relative; z-index:1; }
+    h1 { margin:0; font-size:1.45rem; font-weight:800; letter-spacing:-.01em; }
+    header p { max-width:34ch; margin:4px 0 0; color:rgba(255,255,255,.82); font-size:.88rem; }
 
     /* Tab tahap */
-    .tabs { display:flex; gap:4px; background:var(--card); border:1px solid var(--line); padding:4px; border-radius:12px; margin-bottom:12px; position:sticky; top:8px; z-index:20; }
-    .tab { flex:1; border:none; padding:10px 8px; border-radius:9px; font-weight:600; background:transparent; color:var(--ink-2); }
-    .tab[aria-pressed="true"] { background:var(--red-700); color:#fff; }
+    .tabs { display:flex; gap:4px; background:var(--card); border:1px solid var(--line); padding:4px; border-radius:14px; margin-bottom:12px; position:sticky; top:8px; z-index:20; box-shadow:0 4px 14px rgba(74,70,185,.10); }
+    .tab { flex:1; border:none; padding:10px 4px; border-radius:10px; font-weight:700; font-size:.84rem; line-height:1.2; background:transparent; color:var(--ink-2); }
+    .tab[aria-pressed="true"] { background:linear-gradient(135deg, var(--p-600), var(--p-700)); color:#fff; }
 
-    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:12px; }
-    .card h2 { margin:0 0 12px; font-size:.95rem; color:var(--red-800); display:flex; align-items:center; gap:8px; }
-    .card h2::before { content:""; width:4px; height:16px; border-radius:2px; background:var(--red-700); }
-    .tag { display:inline-block; margin-left:6px; padding:1px 8px; font-size:.74rem; font-weight:600; color:var(--red-800); background:var(--red-100); border-radius:999px; vertical-align:1px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:12px; }
+    .card h2 { margin:0 0 12px; font-size:.95rem; color:var(--p-800); display:flex; align-items:center; gap:8px; }
+    .card h2::before { content:""; width:4px; height:16px; border-radius:2px; background:var(--p-600); }
+    .card h2 .hapus { margin-left:auto; }
+    .tag { display:inline-block; margin-left:6px; padding:1px 8px; font-size:.74rem; font-weight:600; color:var(--p-800); background:var(--p-100); border-radius:999px; vertical-align:1px; }
     .catatan { margin:10px 0 0; font-size:.82rem; line-height:1.45; color:var(--ink-2); }
 
-    /* Ceklist Absolute */
-    .cekgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .cek { display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 6px; font-size:.85rem; font-weight:600; line-height:1.25; text-align:center; color:var(--ink-2); background:#fff; border:1px solid #d6d3d1; border-radius:10px; }
-    .cek i { display:grid; place-items:center; width:26px; height:26px; font-style:normal; font-size:16px; color:transparent; border:2px solid #d6d3d1; border-radius:8px; }
-    .cek small { font-size:.72rem; font-weight:400; color:var(--ink-3); }
-    .cek[aria-pressed="true"] { color:var(--red-900); background:var(--red-50); border-color:var(--red-700); }
-    .cek[aria-pressed="true"] i { color:#fff; background:var(--red-700); border-color:var(--red-700); }
-    .cekbaris { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; font-size:.85rem; color:var(--ink-2); }
+    /* Kelengkapan Absolute: 3 tombol sejajar, bentuknya sama dengan kategori Billing */
+    .cekgrid { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; }
+    .cek { --c:#2563eb; --t:#eff6ff; --b:#bfdbfe;
+      padding:12px 2px; font-size:.82rem; font-weight:700; line-height:1.2; color:var(--c); background:var(--t); border:1.5px solid var(--b); border-radius:12px; }
+    .cek[data-k="sj"]    { --c:#1d4ed8; --t:#eff6ff; --b:#bfdbfe; }
+    .cek[data-k="ttd"]   { --c:#b45309; --t:#fffbeb; --b:#fcd34d; }
+    .cek[data-k="semua"] { --c:#15803d; --t:#f0fdf4; --b:#86efac; }
+    .cek[aria-pressed="true"] { color:#fff; background:var(--c); border-color:var(--c); }
+    .cekbaris { display:flex; align-items:center; margin-top:10px; font-size:.85rem; color:var(--ink-2); }
     .cekbaris label { display:flex; align-items:center; gap:6px; cursor:pointer; }
-    input[type="checkbox"] { accent-color:var(--red-700); }
+    input[type="checkbox"] { accent-color:var(--p-600); }
 
     /* Billing */
     .tgl { display:block; margin-bottom:10px; font-size:.82rem; font-weight:600; color:var(--ink-2); }
-    .tgl input { display:block; width:100%; margin-top:5px; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #d6d3d1; border-radius:9px; }
-    .katgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .kat { padding:12px 6px; font-weight:600; color:var(--ink-2); background:#fff; border:1px solid #d6d3d1; border-radius:10px; }
-    .kat[aria-pressed="true"] { color:var(--red-900); background:var(--red-50); border-color:var(--red-700); box-shadow:inset 0 0 0 1px var(--red-700); }
+    .tgl input { display:block; width:100%; margin-top:5px; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #cfcde6; border-radius:10px; }
+    .cepat { display:flex; gap:6px; margin:-2px 0 12px; }
+    .cepat button { padding:5px 12px; font-size:.8rem; font-weight:600; color:var(--p-800); background:#fff; border:1px solid var(--p-200); border-radius:999px; }
+    .cepat button[aria-pressed="true"] { color:#fff; background:var(--p-600); border-color:var(--p-600); }
+    .katgrid { display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; }
+    .kat { --c:#6d28d9; --t:#f5f3ff; --b:#c4b5fd;
+      padding:12px 2px; font-size:.82rem; font-weight:700; line-height:1.2; color:var(--c); background:var(--t); border:1.5px solid var(--b); border-radius:12px; }
+    .kat[data-v="Kredit"]    { --c:#6d28d9; --t:#f5f3ff; --b:#c4b5fd; }
+    .kat[data-v="COD 1.5%"]  { --c:#b45309; --t:#fffbeb; --b:#fcd34d; }
+    .kat[data-v="Batal COD"] { --c:#be123c; --t:#fff1f2; --b:#fda4af; }
+    .kat[data-v="COD"]       { --c:#0f766e; --t:#f0fdfa; --b:#5eead4; }
+    .kat[aria-pressed="true"] { color:#fff; background:var(--c); border-color:var(--c); }
 
     /* Kamera */
-    #kamera { position:relative; height:160px; overflow:hidden; background:var(--ink); border-radius:12px; cursor:pointer; }
+    #kamera { position:relative; height:160px; overflow:hidden; background:var(--p-900); border-radius:14px; cursor:pointer; }
     #reader, #reader__scan_region { width:100%; height:100% !important; min-height:0 !important; border:none !important; }
     #reader video { display:block; width:100% !important; height:100% !important; object-fit:cover; }
-    #reader #qr-shaded-region { border-color:rgba(28, 25, 23, .5) !important; }
-    #reader #qr-shaded-region div { background-color:#fca5a5 !important; }
-    #pesanKamera { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:14px; overflow:auto; text-align:center; font-size:.85rem; line-height:1.45; color:#fff; background:rgba(28, 25, 23, .85); }
-    .garis { position:absolute; left:6%; right:6%; top:50%; height:2px; opacity:0; pointer-events:none; background:#fecaca; box-shadow:0 0 8px #f87171; }
-    #kamera.kedip, #panelAlat.kedip { box-shadow:inset 0 0 0 4px #fca5a5; }
+    #reader #qr-shaded-region { border-color:rgba(43, 40, 115, .5) !important; }
+    #reader #qr-shaded-region div { background-color:var(--p-300) !important; }
+    #pesanKamera { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:14px; overflow:auto; text-align:center; font-size:.85rem; line-height:1.45; color:#fff; background:rgba(43, 40, 115, .88); }
+    .garis { position:absolute; left:6%; right:6%; top:50%; height:2px; opacity:0; pointer-events:none; background:#d9ccf5; box-shadow:0 0 8px var(--p-300); }
+    #kamera.kedip, #panelAlat.kedip { box-shadow:inset 0 0 0 4px var(--p-300); }
     #kamera.aktif .garis { opacity:1; animation:sapu 1.8s ease-in-out infinite alternate; }
     @keyframes sapu { from { top:22%; } to { top:78%; } }
     @media (prefers-reduced-motion: reduce) { #kamera.aktif .garis { animation:none; } }
 
     /* Alat scanner USB */
-    .alat { display:flex; flex-direction:column; align-items:center; gap:4px; padding:24px 14px; text-align:center; background:var(--red-50); border:1px dashed #f87171; border-radius:12px; }
-    .alat strong { font-size:1.05rem; color:var(--red-800); }
+    .alat { display:flex; flex-direction:column; align-items:center; gap:4px; padding:24px 14px; text-align:center; background:var(--p-50); border:1px dashed var(--p-300); border-radius:14px; }
+    .alat strong { font-size:1.05rem; color:var(--p-800); }
     .alat span { font-size:.88rem; color:var(--ink-2); }
 
     .baris { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px; }
     .chip { padding:6px 12px; border-radius:999px; font-size:.85rem; font-weight:600; }
-    #jumlah { background:var(--red-100); color:var(--red-800); }
+    #jumlah { background:var(--p-100); color:var(--p-800); }
     #antrean { background:var(--kuning-bg); color:var(--kuning); }
-    .kecil { padding:6px 12px; border-radius:999px; border:1px solid var(--red-700); background:#fff; color:var(--red-800); font-size:.85rem; font-weight:600; }
+    .kecil { padding:6px 12px; border-radius:999px; border:1px solid var(--p-600); background:#fff; color:var(--p-800); font-size:.85rem; font-weight:600; }
     #btnCara { margin-left:auto; }
     #pesan { min-height:20px; margin:8px 0 0; font-size:.9rem; text-align:center; }
-    #pesan.err { color:var(--red-700); }
+    #pesan.err { color:var(--merah); }
     #pesan.ok { color:var(--hijau); }
 
     /* Input manual */
     .manual { display:flex; gap:8px; margin-top:10px; }
-    .manual input { flex:1; min-width:0; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #d6d3d1; border-radius:9px; }
-    .manual button { padding:10px 20px; border:none; background:var(--red-700); color:#fff; border-radius:10px; font-weight:700; }
-    .manual button:hover { background:var(--red-800); }
+    .manual input { flex:1; min-width:0; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #cfcde6; border-radius:10px; }
+    .manual button { padding:10px 20px; border:none; background:var(--p-600); color:#fff; border-radius:10px; font-weight:700; }
+    .manual button:hover { background:var(--p-700); }
 
     /* Hasil scan */
     #kosong { margin:0; font-size:.9rem; color:var(--ink-2); }
@@ -95,60 +113,50 @@
     .lencana { flex:none; padding:3px 10px; font-size:.78rem; font-weight:600; border-radius:999px; white-space:nowrap; }
     .lencana.ok { color:var(--hijau); background:var(--hijau-bg); }
     .lencana.sudah, .lencana.kurang, .lencana.periksa { color:var(--kuning); background:var(--kuning-bg); }
-    .lencana.tidak, .lencana.gagal { color:var(--red-800); background:var(--red-100); }
-    .lencana.proses, .lencana.antre { color:var(--ink-2); background:var(--bg); }
+    .lencana.tidak, .lencana.gagal { color:var(--merah); background:var(--merah-bg); }
+    .lencana.proses, .lencana.antre { color:var(--ink-2); background:var(--p-100); }
 
     /* Pop-up cara scan */
-    .modal { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(28, 25, 23, .6); }
-    .kotak { width:100%; max-width:400px; padding:20px; background:#fff; border-radius:14px; }
-    .kotak h3 { margin:0 0 6px; font-size:1.05rem; color:var(--red-800); }
+    .modal { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(43, 40, 115, .6); }
+    .kotak { width:100%; max-width:400px; padding:20px; background:#fff; border-radius:16px; }
+    .kotak h3 { margin:0 0 6px; font-size:1.05rem; color:var(--p-800); }
     .kotak p { margin:0 0 12px; font-size:.9rem; color:var(--ink-2); }
-    .kotak p.galat { color:var(--red-700); }
-    .kotak button { display:block; width:100%; margin-top:8px; padding:12px; font-weight:600; color:var(--red-800); background:#fff; border:1px solid #d6d3d1; border-radius:10px; }
+    .kotak p.galat { color:var(--merah); }
+    .kotak button { display:block; width:100%; margin-top:8px; padding:12px; font-weight:600; color:var(--p-800); background:#fff; border:1px solid #cfcde6; border-radius:12px; }
     .kotak button small { display:block; margin-top:2px; font-size:.78rem; font-weight:400; color:var(--ink-2); }
-    .kotak button.terakhir { color:#fff; background:var(--red-700); border-color:var(--red-700); }
-    .kotak button.terakhir small { color:#fecaca; }
+    .kotak button.terakhir { color:#fff; background:var(--p-600); border-color:var(--p-600); }
+    .kotak button.terakhir small { color:var(--p-200); }
     #mTutup { color:var(--ink-2); background:transparent; border-color:transparent; font-weight:500; }
   </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <h1>Scanner DO</h1>
+    <h1>Scanner N2N Proses</h1>
     <p>Scan nomor DO, penerimaan, POD, dan released billing tercatat otomatis.</p>
   </header>
 
   <div class="tabs" role="group" aria-label="Tahap scan">
-    <button type="button" class="tab" id="tStore" aria-pressed="true">Storeman</button>
-    <button type="button" class="tab" id="tAbs" aria-pressed="false">Absolute</button>
-    <button type="button" class="tab" id="tBill" aria-pressed="false">Billing</button>
-  </div>
-
-  <div class="card" id="panelCek" hidden>
-    <h2>Kelengkapan dokumen</h2>
-    <div class="cekgrid">
-      <button type="button" class="cek" data-k="sj" aria-pressed="false"><i aria-hidden="true">✓</i>Surat Jalan<small>tekan 1</small></button>
-      <button type="button" class="cek" data-k="ttd" aria-pressed="false"><i aria-hidden="true">✓</i>TTD &amp; Stempel<small>tekan 2</small></button>
-    </div>
-    <div class="cekbaris">
-      <button type="button" class="kecil" id="cekSemua">Lengkap semua (3)</button>
-      <label><input type="checkbox" id="pertahankan"> Pertahankan centang</label>
-    </div>
-    <p class="catatan">Pintasan keyboard: 1 = hanya Surat Jalan, 2 = hanya TTD &amp; Stempel, 3 = keduanya lengkap. Atau ketuk tombolnya. Pilih dulu, lalu scan. Kalau ada yang kurang, otomatis tertulis di Keterangan dan kolom POD tidak tercentang. Scan ulang nomor itu setelah dilengkapi.</p>
+    <button type="button" class="tab" id="tStore" aria-pressed="true">Storeman Berangkat</button>
+    <button type="button" class="tab" id="tAbs" aria-pressed="false">Absolute Balik</button>
+    <button type="button" class="tab" id="tBill" aria-pressed="false">Billing Admin</button>
   </div>
 
   <div class="card" id="panelBilling" hidden>
     <h2>Data released billing</h2>
-    <label class="tgl">Tanggal
-      <input type="date" id="tanggal" autocomplete="off">
-    </label>
+    <label class="tgl" for="tanggal" style="margin-bottom:5px">Tanggal</label>
+    <input type="date" id="tanggal" autocomplete="off" style="display:block;width:100%;margin:-5px 0 10px;padding:10px 12px;font:inherit;color:var(--ink);background:#fff;border:1px solid #cfcde6;border-radius:10px;">
+    <div class="cepat" role="group" aria-label="Tanggal cepat">
+      <button type="button" data-off="0" aria-pressed="true">Hari ini</button>
+      <button type="button" data-off="-1" aria-pressed="false">Kemarin</button>
+    </div>
     <div class="katgrid" role="group" aria-label="Kategori">
       <button type="button" class="kat" data-v="Kredit" aria-pressed="false">Kredit</button>
       <button type="button" class="kat" data-v="COD 1.5%" aria-pressed="false">COD 1.5%</button>
       <button type="button" class="kat" data-v="Batal COD" aria-pressed="false">Batal COD</button>
       <button type="button" class="kat" data-v="COD" aria-pressed="false">COD</button>
     </div>
-    <p class="catatan">Pilih tanggal dan kategori dulu, lalu scan. Setiap scan menambah satu baris di sheet Released Billing memakai pilihan ini, sampai Anda menggantinya. Nomor Billing (kolom E) tidak diisi oleh scanner.</p>
+    <p class="catatan">Tanggal otomatis terisi hari ini, ubah bila perlu. Pilih kategori, lalu scan. Setiap scan menambah satu baris di sheet Released Billing memakai pilihan ini, sampai Anda menggantinya. Nomor Billing (kolom E) tidak diisi oleh scanner.</p>
   </div>
 
   <div class="card">
@@ -176,8 +184,21 @@
     </form>
   </div>
 
+  <div class="card" id="panelCek" hidden>
+    <h2>Kelengkapan dokumen</h2>
+    <div class="cekgrid">
+      <button type="button" class="cek" data-k="sj" aria-pressed="false">Surat Jalan</button>
+      <button type="button" class="cek" data-k="ttd" aria-pressed="false">TTD &amp; Stempel</button>
+      <button type="button" class="cek" data-k="semua" aria-pressed="false">Lengkap semua</button>
+    </div>
+    <div class="cekbaris">
+      <label><input type="checkbox" id="pertahankan"> Pertahankan centang</label>
+    </div>
+    <p class="catatan">Pilih kelengkapan dulu, baru scan. Scan tidak diproses sebelum ada yang dipilih. Pintasan keyboard: 1 = hanya Surat Jalan, 2 = hanya TTD &amp; Stempel, 3 = keduanya lengkap. Kalau ada yang kurang, otomatis tertulis di Keterangan dan kolom POD tidak tercentang. Scan ulang nomor itu setelah dilengkapi.</p>
+  </div>
+
   <div class="card">
-    <h2>Hasil scan</h2>
+    <h2><span id="judulHasil">Hasil scan</span><button type="button" class="kecil hapus" id="btnHapus" hidden>Hapus hasil</button></h2>
     <p id="kosong">Belum ada nomor yang discan.</p>
     <ul id="daftar"></ul>
   </div>
@@ -232,7 +253,7 @@
   }
 
   // ---- Tahap scan: storeman, absolute, billing ----
-  const NAMA_TAHAP = { storeman: 'Storeman', absolute: 'Absolute', billing: 'Billing' };
+  const NAMA_TAHAP = { storeman: 'Storeman Berangkat', absolute: 'Absolute Balik', billing: 'Billing Admin' };
   let tahap = ['storeman', 'absolute', 'billing'].includes(bacaLokal('tahap')) ? bacaLokal('tahap') : 'storeman';
   function setTahap(t, simpan) {
     tahap = t;
@@ -242,38 +263,70 @@
     $('tBill').setAttribute('aria-pressed', String(t === 'billing'));
     $('panelCek').hidden = t !== 'absolute';
     $('panelBilling').hidden = t !== 'billing';
+    if (t === 'billing') segarkanTanggal();
+    render();
     pesan('');
   }
   $('tStore').addEventListener('click', () => setTahap('storeman', true));
   $('tAbs').addEventListener('click', () => setTahap('absolute', true));
   $('tBill').addEventListener('click', () => setTahap('billing', true));
 
-  // ---- Ceklist kelengkapan: Surat Jalan dan TTD & Stempel ----
+  // ---- Ceklist kelengkapan: Surat Jalan, TTD & Stempel, Lengkap semua ----
   const kosongCek = () => ({ sj: false, ttd: false });
   let cek = kosongCek();
   let pertahankan = bacaLokal('pertahankan') === '1';
 
   function renderCek() {
-    document.querySelectorAll('.cek').forEach((b) => b.setAttribute('aria-pressed', String(cek[b.dataset.k])));
+    document.querySelectorAll('.cek').forEach((b) => {
+      const k = b.dataset.k;
+      b.setAttribute('aria-pressed', String(k === 'semua' ? (cek.sj && cek.ttd) : cek[k]));
+    });
   }
-  document.querySelectorAll('.cek').forEach((b) => b.addEventListener('click', () => { cek[b.dataset.k] = !cek[b.dataset.k]; renderCek(); }));
-  $('cekSemua').addEventListener('click', () => { cek = { sj: true, ttd: true }; renderCek(); });
+  document.querySelectorAll('.cek').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.k;
+    if (k === 'semua') { const lengkap = cek.sj && cek.ttd; cek = { sj: !lengkap, ttd: !lengkap }; }
+    else cek[k] = !cek[k];
+    renderCek();
+  }));
   // Pintasan keyboard tahap Absolute (angka atas maupun numpad): 1 = Surat Jalan, 2 = TTD & Stempel, 3 = keduanya
   const PINTAS = { '1': { sj: true, ttd: false }, '2': { sj: false, ttd: true }, '3': { sj: true, ttd: true } };
   let timerPintas = null;
   $('pertahankan').addEventListener('change', (e) => { pertahankan = e.target.checked; simpanLokal('pertahankan', pertahankan ? '1' : '0'); });
 
   // ---- Released Billing: tanggal dan kategori ----
-  // Sengaja tidak disimpan antar sesi: tanggal yang basi akan salah tercatat tanpa terlihat.
+  // Kategori sengaja tidak disimpan antar sesi. Tanggal otomatis terisi hari ini (bukan tanggal lama),
+  // dan ikut berganti sendiri bila halaman dibiarkan terbuka melewati tengah malam, selama belum diubah manual.
   let kategori = '';
+  let tanggalManual = false;
+  const isoHari = (geser) => {
+    const d = new Date(); d.setDate(d.getDate() + (geser || 0));
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  };
   const fmtTgl = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; };
+  function tandaiCepat() {
+    document.querySelectorAll('.cepat button').forEach((b) => b.setAttribute('aria-pressed', String($('tanggal').value === isoHari(Number(b.dataset.off)))));
+  }
+  function segarkanTanggal() {
+    if (!tanggalManual || !$('tanggal').value) { $('tanggal').value = isoHari(0); tanggalManual = false; }
+    tandaiCepat();
+  }
+  document.querySelectorAll('.cepat button').forEach((b) => b.addEventListener('click', () => {
+    const off = Number(b.dataset.off);
+    $('tanggal').value = isoHari(off);
+    tanggalManual = off !== 0;
+    tandaiCepat(); pesan('');
+  }));
   document.querySelectorAll('.kat').forEach((b) => b.addEventListener('click', () => {
     kategori = b.dataset.v;
     document.querySelectorAll('.kat').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     pesan('');
   }));
   // Setelah memilih tanggal, lepaskan fokus supaya ketikan alat scanner USB tidak mengubah tanggal
-  $('tanggal').addEventListener('change', () => { $('tanggal').blur(); pesan(''); });
+  $('tanggal').addEventListener('change', () => {
+    tanggalManual = $('tanggal').value !== isoHari(0);
+    tandaiCepat(); $('tanggal').blur(); pesan('');
+  });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) segarkanTanggal(); });
 
   // ---- Tampilan ----
   function pesan(teks, jenis) { $('pesan').textContent = teks || ''; $('pesan').className = jenis || ''; }
@@ -285,10 +338,17 @@
   };
   const sama = (t, k) => (d) => (d.tahap || 'storeman') === t && d.kode.toUpperCase() === k.toUpperCase();
 
+  // Hasil yang masih diproses atau menunggu kirim tidak ikut dihapus, supaya tidak hilang dari pantauan
+  const bisaHapus = (d) => d.status !== 'proses' && d.status !== 'antre';
+
   function render() {
-    $('kosong').hidden = daftar.length > 0;
-    $('jumlah').textContent = daftar.length + ' discan';
-    $('daftar').replaceChildren(...daftar.map((d) => {
+    // Hanya tampilkan hasil milik tab yang sedang aktif
+    const lihat = daftar.filter((d) => (d.tahap || 'storeman') === tahap);
+    $('kosong').hidden = lihat.length > 0;
+    $('jumlah').textContent = lihat.length + ' discan';
+    $('judulHasil').textContent = 'Hasil scan: ' + NAMA_TAHAP[tahap];
+    $('btnHapus').hidden = !lihat.some(bisaHapus);
+    $('daftar').replaceChildren(...lihat.map((d) => {
       const li = document.createElement('li');
       li.className = d.status;
       const kiri = document.createElement('div');
@@ -330,6 +390,18 @@
       item.ket = 'Nomor ini tidak ada di kolom NO DOCUMENT';
     }
   }
+
+  // Hapus hasil di tab aktif saja, supaya nomornya bisa discan ulang. Data di spreadsheet tidak ikut terhapus.
+  $('btnHapus').addEventListener('click', () => {
+    const t = tahap;
+    const hapusan = daftar.filter((d) => (d.tahap || 'storeman') === t && bisaHapus(d));
+    if (!hapusan.length) return;
+    if (!confirm('Hapus ' + hapusan.length + ' hasil scan di ' + NAMA_TAHAP[t] + '?\nData yang sudah masuk ke spreadsheet tidak ikut terhapus.')) return;
+    daftar = daftar.filter((d) => !hapusan.includes(d));
+    kunciTerakhir = '';
+    render();
+    pesan('');
+  });
 
   // ---- Pengiriman dan antrean offline ----
   let antrean = (() => { try { return JSON.parse(localStorage.getItem('antrean_do') || '[]'); } catch (e) { return []; } })();
@@ -480,6 +552,11 @@
       kat = kategori;
       if (!tanggalIso) return tolak('Pilih tanggal dulu sebelum scan Billing.', 'pilihan');
       if (!kat) return tolak('Pilih kategori dulu sebelum scan Billing.', 'pilihan');
+    }
+
+    // Absolute: tidak diproses sebelum kelengkapan dokumen dipilih
+    if (tahap === 'absolute' && !cek.sj && !cek.ttd) {
+      return tolak('Pilih kelengkapan dokumen dulu (Surat Jalan, TTD & Stempel, atau Lengkap semua) sebelum scan.', 'pilihan');
     }
 
     const sekarang = Date.now();
@@ -650,6 +727,7 @@
   window.addEventListener('load', () => {
     render();
     simpanAntrean();
+    segarkanTanggal();
     setTahap(tahap);
     renderCek();
     $('pertahankan').checked = pertahankan;

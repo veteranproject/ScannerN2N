@@ -42,17 +42,22 @@
     .tag { display:inline-block; margin-left:6px; padding:1px 8px; font-size:.74rem; font-weight:600; color:var(--p-800); background:var(--p-100); border-radius:999px; vertical-align:1px; }
     .catatan { margin:10px 0 0; font-size:.82rem; line-height:1.45; color:var(--ink-2); }
 
-    /* Kelengkapan Absolute: 3 tombol sejajar, bentuknya sama dengan kategori Billing */
-    .cekgrid { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; }
+    /* Kelengkapan Absolute: 4 tombol sejajar, bentuknya sama dengan kategori Billing */
+    .cekgrid { display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; }
     .cek { --c:#2563eb; --t:#eff6ff; --b:#bfdbfe;
       padding:12px 2px; font-size:.82rem; font-weight:700; line-height:1.2; color:var(--c); background:var(--t); border:1.5px solid var(--b); border-radius:12px; }
     .cek[data-k="sj"]    { --c:#1d4ed8; --t:#eff6ff; --b:#bfdbfe; }
     .cek[data-k="ttd"]   { --c:#b45309; --t:#fffbeb; --b:#fcd34d; }
     .cek[data-k="semua"] { --c:#15803d; --t:#f0fdf4; --b:#86efac; }
+    .cek[data-k="tidak"] { --c:#b91c1c; --t:#fef2f2; --b:#fca5a5; }
     .cek[aria-pressed="true"] { color:#fff; background:var(--c); border-color:var(--c); }
     .cekbaris { display:flex; align-items:center; margin-top:10px; font-size:.85rem; color:var(--ink-2); }
     .cekbaris label { display:flex; align-items:center; gap:6px; cursor:pointer; }
     input[type="checkbox"] { accent-color:var(--p-600); }
+
+    .menunggu { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:0 0 12px; padding:12px; color:var(--kuning); background:var(--kuning-bg); border:1px solid #fcd34d; border-radius:12px; font-size:.9rem; }
+    .menunggu strong { word-break:break-all; }
+    .menunggu .kecil { margin-left:auto; }
 
     /* Billing */
     .tgl { display:block; margin-bottom:10px; font-size:.82rem; font-weight:600; color:var(--ink-2); }
@@ -112,7 +117,8 @@
     .ket { margin-top:2px; font-size:.82rem; color:var(--ink-2); }
     .lencana { flex:none; padding:3px 10px; font-size:.78rem; font-weight:600; border-radius:999px; white-space:nowrap; }
     .lencana.ok { color:var(--hijau); background:var(--hijau-bg); }
-    .lencana.sudah, .lencana.kurang, .lencana.periksa { color:var(--kuning); background:var(--kuning-bg); }
+    .lencana.sudah, .lencana.periksa { color:var(--kuning); background:var(--kuning-bg); }
+    .lencana.kurang { color:var(--merah); background:var(--merah-bg); }
     .lencana.tidak, .lencana.gagal { color:var(--merah); background:var(--merah-bg); }
     .lencana.proses, .lencana.antre { color:var(--ink-2); background:var(--p-100); }
 
@@ -186,15 +192,15 @@
 
   <div class="card" id="panelCek" hidden>
     <h2>Kelengkapan dokumen</h2>
+    <div class="menunggu" id="menunggu" hidden><span>Menunggu kelengkapan untuk <strong id="menungguKode"></strong></span><button type="button" class="kecil" id="btnBatal">Batal</button></div>
+    <p class="catatan" id="petunjukScan" style="margin:0 0 10px">Scan nomor DO dulu, lalu pilih kelengkapan dokumen di bawah.</p>
     <div class="cekgrid">
       <button type="button" class="cek" data-k="sj" aria-pressed="false">Surat Jalan</button>
       <button type="button" class="cek" data-k="ttd" aria-pressed="false">TTD &amp; Stempel</button>
       <button type="button" class="cek" data-k="semua" aria-pressed="false">Lengkap semua</button>
+      <button type="button" class="cek" data-k="tidak" aria-pressed="false">Tidak lengkap</button>
     </div>
-    <div class="cekbaris">
-      <label><input type="checkbox" id="pertahankan"> Pertahankan centang</label>
-    </div>
-    <p class="catatan">Pilih kelengkapan dulu, baru scan. Scan tidak diproses sebelum ada yang dipilih. Pintasan keyboard: 1 = hanya Surat Jalan, 2 = hanya TTD &amp; Stempel, 3 = keduanya lengkap. Kalau ada yang kurang, otomatis tertulis di Keterangan dan kolom POD tidak tercentang. Scan ulang nomor itu setelah dilengkapi.</p>
+    <p class="catatan">Urutan: scan nomor DO dulu, baru ketuk kelengkapan dokumen. Data dikirim ke sheet setelah kelengkapan dipilih. Pintasan keyboard: 1 = hanya Surat Jalan, 2 = hanya TTD &amp; Stempel, 3 = keduanya lengkap, 4 = tidak lengkap. Dokumen yang tidak dipilih dibiarkan kosong (tidak tercentang) di sheet, begitu juga Diterima Absolute. Tidak lengkap mengosongkan Surat Jalan dan TTD &amp; Stempel. Nomor yang masih kurang boleh discan ulang dan dilengkapi.</p>
   </div>
 
   <div class="card">
@@ -271,27 +277,39 @@
   $('tAbs').addEventListener('click', () => setTahap('absolute', true));
   $('tBill').addEventListener('click', () => setTahap('billing', true));
 
-  // ---- Ceklist kelengkapan: Surat Jalan, TTD & Stempel, Lengkap semua ----
-  const kosongCek = () => ({ sj: false, ttd: false });
-  let cek = kosongCek();
-  let pertahankan = bacaLokal('pertahankan') === '1';
+  // ---- Absolute Balik: scan dulu, baru pilih kelengkapan dokumen ----
+  // Scan hanya menahan nomor di "menunggu". Nomor baru dikirim setelah salah satu tombol kelengkapan diketuk.
+  let menunggu = null;   // {kode, waktu}
+  const PILIHAN = { sj: { sj: true }, ttd: { ttd: true }, semua: { sj: true, ttd: true }, tidak: { tidak: true } };
+  // Pintasan keyboard (angka atas maupun numpad): 1 = Surat Jalan, 2 = TTD & Stempel, 3 = keduanya, 4 = tidak lengkap
+  const PINTAS = { '1': PILIHAN.sj, '2': PILIHAN.ttd, '3': PILIHAN.semua, '4': PILIHAN.tidak };
+  let timerPintas = null;
 
-  function renderCek() {
-    document.querySelectorAll('.cek').forEach((b) => {
-      const k = b.dataset.k;
-      b.setAttribute('aria-pressed', String(k === 'semua' ? (cek.sj && cek.ttd) : cek[k]));
-    });
+  function renderMenunggu() {
+    $('menunggu').hidden = !menunggu;
+    $('petunjukScan').hidden = !!menunggu;
+    $('menungguKode').textContent = menunggu ? menunggu.kode : '';
+  }
+
+  function pilihKelengkapan(p) {
+    if (!menunggu) return false;
+    const kode = menunggu.kode, waktu = menunggu.waktu;
+    menunggu = null;
+    renderMenunggu();
+    const ada = daftar.find(sama('absolute', kode));
+    if (ada) daftar.splice(daftar.indexOf(ada), 1);     // sisa hasil 'kurang' sebelumnya diganti
+    daftar.unshift({ kode: kode, tahap: 'absolute', status: 'proses', ket: '' });
+    render();
+    antrean.push({ kode: kode, waktu: waktu, tahap: 'absolute', cek: { sj: !!p.sj, ttd: !!p.ttd, tidak: !!p.tidak } });
+    simpanAntrean();
+    bilasAntrean();
+    return true;
   }
   document.querySelectorAll('.cek').forEach((b) => b.addEventListener('click', () => {
-    const k = b.dataset.k;
-    if (k === 'semua') { const lengkap = cek.sj && cek.ttd; cek = { sj: !lengkap, ttd: !lengkap }; }
-    else cek[k] = !cek[k];
-    renderCek();
+    if (!menunggu) return tolak('Scan nomor DO dulu, baru pilih kelengkapan dokumen.', 'belumscan');
+    pilihKelengkapan(PILIHAN[b.dataset.k]);
   }));
-  // Pintasan keyboard tahap Absolute (angka atas maupun numpad): 1 = Surat Jalan, 2 = TTD & Stempel, 3 = keduanya
-  const PINTAS = { '1': { sj: true, ttd: false }, '2': { sj: false, ttd: true }, '3': { sj: true, ttd: true } };
-  let timerPintas = null;
-  $('pertahankan').addEventListener('change', (e) => { pertahankan = e.target.checked; simpanLokal('pertahankan', pertahankan ? '1' : '0'); });
+  $('btnBatal').addEventListener('click', () => { menunggu = null; renderMenunggu(); pesan(''); });
 
   // ---- Released Billing: tanggal dan kategori ----
   // Kategori sengaja tidak disimpan antar sesi. Tanggal otomatis terisi hari ini (bukan tanggal lama),
@@ -331,7 +349,7 @@
   // ---- Tampilan ----
   function pesan(teks, jenis) { $('pesan').textContent = teks || ''; $('pesan').className = jenis || ''; }
 
-  const LABEL = { proses: 'Memproses', ok: 'Diterima', sudah: 'Sudah diterima', kurang: 'Belum lengkap', periksa: 'Periksa', tidak: 'Tidak ditemukan', antre: 'Menunggu kirim', gagal: 'Gagal' };
+  const LABEL = { proses: 'Memproses', ok: 'Diterima', sudah: 'Sudah diterima', kurang: 'Tidak lengkap', periksa: 'Periksa', tidak: 'Tidak ditemukan', antre: 'Menunggu kirim', gagal: 'Gagal' };
   const labelStatus = (d) => {
     if (d.tahap === 'billing') return d.status === 'ok' ? 'Tercatat' : d.status === 'sudah' ? 'Sudah tercatat' : LABEL[d.status];
     return (d.status === 'ok' && d.tahap === 'absolute') ? 'Lengkap' : (d.status === 'sudah' && d.tahap === 'absolute') ? 'Sudah lengkap' : LABEL[d.status];
@@ -380,10 +398,10 @@
 
     const abs = t === 'absolute';
     if (h.status === 'ok') {
-      item.ket = abs ? (h.baris > 1 ? 'Lengkap, POD tercentang di ' + h.baris + ' baris' : 'Lengkap, POD tercentang')
+      item.ket = abs ? (h.baris > 1 ? 'Lengkap, tercatat di ' + h.baris + ' baris' : 'Lengkap, Diterima Absolute tercentang')
         : (h.baris > 1 ? h.baris + ' baris diperbarui' : 'Tanggal penerimaan tercatat');
     } else if (h.status === 'kurang') {
-      item.ket = 'Kurang: ' + (h.kurang || []).join(', ') + '. POD tidak tercentang. Scan ulang setelah dilengkapi.';
+      item.ket = 'Tidak lengkap, kurang: ' + (h.kurang || []).join(', ') + '. Scan ulang setelah dilengkapi.';
     } else if (h.status === 'sudah') {
       item.ket = (abs ? 'Sudah lengkap, oleh ' : 'Oleh ') + h.user + ', ' + h.waktu;
     } else {
@@ -470,7 +488,6 @@
 
   // ---- Suara ----
   // Browser hanya mengizinkan suara setelah ada ketukan/tombol dari pengguna, jadi audio "dibuka" pada interaksi pertama.
-  // Tanpa ini, scan lewat kamera bisa senyap karena tidak ada interaksi tepat sebelum bunyi.
   let suaraNyala = bacaLokal('suara') !== '0';
   let audio = null;
   function siapAudio() {
@@ -554,9 +571,10 @@
       if (!kat) return tolak('Pilih kategori dulu sebelum scan Billing.', 'pilihan');
     }
 
-    // Absolute: tidak diproses sebelum kelengkapan dokumen dipilih
-    if (tahap === 'absolute' && !cek.sj && !cek.ttd) {
-      return tolak('Pilih kelengkapan dokumen dulu (Surat Jalan, TTD & Stempel, atau Lengkap semua) sebelum scan.', 'pilihan');
+    // Absolute: nomor ditahan dulu, dikirim setelah kelengkapan dokumen dipilih
+    if (tahap === 'absolute' && menunggu) {
+      if (menunggu.kode.toUpperCase() === kode.toUpperCase()) return;   // barcode yang sama masih di depan kamera
+      return tolak('Pilih kelengkapan untuk ' + menunggu.kode + ' dulu (atau ketuk Batal) sebelum scan nomor berikutnya.', 'menunggu');
     }
 
     const sekarang = Date.now();
@@ -567,7 +585,15 @@
     // Nomor yang sudah discan ditolak, kecuali yang belum lengkap (boleh discan ulang)
     const ada = daftar.find(sama(tahap, kode));
     if (ada && ada.status !== 'kurang') return tolak(kode + ' sudah discan (' + NAMA_TAHAP[tahap] + ') pada sesi ini.', kunci);
-    if (ada) daftar.splice(daftar.indexOf(ada), 1);
+    if (ada && tahap !== 'absolute') daftar.splice(daftar.indexOf(ada), 1);
+
+    if (tahap === 'absolute') {
+      tandaScan();
+      menunggu = { kode: kode, waktu: sekarang };
+      renderMenunggu();
+      pesan('Nomor ' + kode + ' discan. Pilih kelengkapan dokumen.', 'ok');
+      return;
+    }
 
     tandaScan();
     pesan('');
@@ -575,13 +601,11 @@
     render();
 
     const butir = { kode: kode, waktu: sekarang, tahap: tahap };
-    if (tahap === 'absolute') butir.cek = Object.assign({}, cek);   // kelengkapan dokumen saat scan
     if (tahap === 'billing') { butir.tanggal = tanggalIso; butir.kategori = kat; }
     antrean.push(butir);
     simpanAntrean();
     bilasAntrean();
 
-    if (tahap === 'absolute' && !pertahankan) { cek = kosongCek(); renderCek(); }   // centang kembali kosong untuk dokumen berikutnya
   }
 
   $('formManual').addEventListener('submit', (e) => {
@@ -690,12 +714,12 @@
     if (e.target === $('tanggal') && e.key.length === 1) e.preventDefault();
     const now = Date.now();
     const jeda = now - tBuf;
-    // Pintasan 1/2/3 hanya berlaku untuk tekanan tunggal. Angka di dalam barcode dari alat scanner datang beruntun
+    // Pintasan 1/2/3/4 hanya berlaku untuk tekanan tunggal. Angka di dalam barcode dari alat scanner datang beruntun
     // (jeda pendek sebelum dan sesudahnya), jadi ditunda sebentar dan dibatalkan kalau ada tombol lain menyusul.
     clearTimeout(timerPintas);
-    if (tahap === 'absolute' && $('modalCara').hidden && jeda > 150 && PINTAS[e.key]) {
+    if (tahap === 'absolute' && menunggu && $('modalCara').hidden && jeda > 150 && PINTAS[e.key]) {
       const pilih = PINTAS[e.key];
-      timerPintas = setTimeout(() => { cek = Object.assign({}, pilih); renderCek(); }, 160);
+      timerPintas = setTimeout(() => pilihKelengkapan(pilih), 160);
     }
     if (jeda > 150) { buf = ''; tMulai = now; }   // jeda panjang = ketikan manusia
     tBuf = now;
@@ -729,8 +753,7 @@
     simpanAntrean();
     segarkanTanggal();
     setTahap(tahap);
-    renderCek();
-    $('pertahankan').checked = pertahankan;
+    renderMenunggu();
     $('btnSuara').textContent = suaraNyala ? 'Suara: nyala' : 'Suara: mati';
     bukaModal();       // pop-up pilihan cara scan selalu tampil saat halaman dibuka
     ambilNama();

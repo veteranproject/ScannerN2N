@@ -129,21 +129,71 @@
     .kotak button.terakhir { color:#fff; background:var(--p-600); border-color:var(--p-600); }
     .kotak button.terakhir small { color:var(--p-200); }
     #mTutup { color:var(--ink-2); background:transparent; border-color:transparent; font-weight:500; }
+
+    /* Sidebar navigasi */
+    .shell { max-width:880px; margin:0 auto; display:flex; gap:14px; align-items:flex-start; }
+    .shell .app { flex:1; min-width:0; max-width:640px; margin:0; }
+    .side { position:sticky; top:12px; align-self:flex-start; height:calc(100vh - 24px); height:calc(100dvh - 24px); flex:none; width:200px; margin-top:12px; padding:10px; display:flex; flex-direction:column; gap:4px; background:var(--card); border:1px solid var(--line); border-radius:16px; box-shadow:0 4px 14px rgba(74,70,185,.08); }
+    .side-judul { padding:6px 10px 8px; font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); }
+    .nav { display:flex; align-items:center; gap:10px; width:100%; padding:11px 12px; border:none; border-radius:10px; background:transparent; color:var(--ink-2); font-weight:700; font-size:.88rem; text-align:left; }
+    .nav b { flex:none; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--p-100); color:var(--p-800); font-size:.75rem; }
+    .nav[aria-pressed="true"] { color:#fff; background:linear-gradient(135deg, var(--p-600), var(--p-700)); }
+    .nav[aria-pressed="true"] b { background:rgba(255,255,255,.22); color:#fff; }
+    .menu-btn { display:none; position:absolute; left:14px; top:14px; z-index:3; width:40px; height:40px; align-items:center; justify-content:center; font-size:1.2rem; color:#fff; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4); border-radius:12px; }
+    .scrim { position:fixed; inset:0; z-index:55; background:rgba(43,40,115,.45); }
+    @media (max-width:760px) {
+      .shell { display:block; }
+      header { padding-left:68px; }
+      .side { position:fixed; z-index:60; top:0; bottom:0; left:0; width:250px; height:100vh; height:100dvh; margin:0; padding-top:calc(env(safe-area-inset-top, 0px) + 14px); border-radius:0 16px 16px 0; transform:translateX(-105%); transition:transform .2s ease; }
+      .side.buka { transform:none; }
+      .menu-btn { display:inline-flex; }
+    }
+
+    /* Sendback */
+    .seg { display:flex; gap:4px; padding:4px; margin-bottom:12px; background:var(--p-50); border:1px solid var(--line); border-radius:12px; }
+    .seg button { flex:1; padding:9px 4px; border:none; border-radius:9px; background:transparent; color:var(--ink-2); font-weight:700; font-size:.82rem; }
+    .seg button[aria-pressed="true"] { background:var(--p-600); color:#fff; }
+    .grup { margin-bottom:10px; }
+    .lbl { margin-bottom:5px; font-size:.82rem; font-weight:600; color:var(--ink-2); }
+    .brg { display:grid; grid-template-columns:1fr 76px 36px; gap:6px; margin-bottom:6px; }
+    .brg input { min-width:0; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #cfcde6; border-radius:10px; }
+    .brg .b-hapus { border:1px solid #cfcde6; border-radius:10px; background:#fff; color:var(--ink-2); font-size:1.1rem; }
+    .tambah { display:block; width:100%; padding:10px; font-weight:600; color:var(--p-800); background:var(--p-50); border:1px dashed var(--p-300); border-radius:10px; }
+    .alt { display:block; width:100%; padding:10px; font-weight:600; color:var(--p-800); background:#fff; border:1px solid #cfcde6; border-radius:10px; }
+    .foto-aksi { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    .thumbs { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .chipfoto { display:inline-flex; align-items:center; gap:6px; padding:4px; font-size:.8rem; background:var(--p-50); border:1px solid var(--line); border-radius:10px; }
+    .chipfoto img { width:64px; height:64px; object-fit:cover; border-radius:8px; }
+    .chipfoto a { padding:6px 4px; font-weight:600; color:var(--p-800); }
+    .x { width:26px; height:26px; border:none; border-radius:50%; background:var(--merah-bg); color:var(--merah); font-weight:700; line-height:1; }
+    .simpan:disabled { opacity:.6; cursor:wait; }
+    .cari { display:block; width:100%; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #cfcde6; border-radius:10px; }
+    .rk { padding:12px 0; border-top:1px solid var(--line); }
+    .rk:first-child { border-top:none; }
+    .rk-atas { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .rk-pm { font-weight:700; word-break:break-all; }
+    .rk-info { margin-top:2px; font-size:.82rem; color:var(--ink-2); }
+    .rk ul { margin:6px 0 0; padding-left:18px; font-size:.85rem; }
+    .rk-foto { display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:6px; font-size:.82rem; }
+    .rk-foto a { color:var(--p-700); font-weight:600; }
   </style>
 </head>
 <body>
+<div class="shell">
+<aside class="side" id="side" aria-label="Menu tahap">
+  <div class="side-judul">Fitur N2N Process</div>
+  <button type="button" class="nav" id="tStore" aria-pressed="true"><b>1</b>Storeman Berangkat</button>
+  <button type="button" class="nav" id="tAbs" aria-pressed="false"><b>2</b>Absolute Balik</button>
+  <button type="button" class="nav" id="tBill" aria-pressed="false"><b>3</b>Billing Admin</button>
+  <button type="button" class="nav" id="tBatal" aria-pressed="false"><b>4</b>Batal DO</button>
+  <button type="button" class="nav" id="tSend" aria-pressed="false"><b>5</b>Sendback</button>
+</aside>
+<div class="scrim" id="scrim" hidden></div>
 <div class="app">
   <header>
-    <h1>Scanner N2N Proses</h1>
-    <p>Scan nomor DO, penerimaan, POD, dan released billing tercatat otomatis.</p>
+    <button type="button" class="menu-btn" id="btnMenu" aria-label="Buka menu">&#9776;</button>
+    <h1 id="judulScan">N2N - Storeman Berangkat</h1>
   </header>
-
-  <div class="tabs" role="group" aria-label="Tahap scan">
-    <button type="button" class="tab" id="tStore" aria-pressed="true">Storeman Berangkat</button>
-    <button type="button" class="tab" id="tAbs" aria-pressed="false">Absolute Balik</button>
-    <button type="button" class="tab" id="tBill" aria-pressed="false">Billing Admin</button>
-    <button type="button" class="tab" id="tBatal" aria-pressed="false">Batal DO</button>
-  </div>
 
   <div class="card">
     <div id="kamera">
@@ -212,6 +262,45 @@
     <button type="button" class="simpan" id="btnSimpan">Simpan</button>
   </div>
 
+  <div class="card" id="panelSend" hidden>
+    <h2>Sendback</h2>
+    <div id="sInput">
+      <div class="menunggu" id="menungguS" hidden><span>Menunggu data sendback untuk <strong id="menungguKodeS"></strong></span><button type="button" class="kecil" id="btnBatalS">Batal</button></div>
+      <p class="catatan" id="petunjukS" style="margin:0 0 10px">Scan nomor PM dulu, lengkapi data, lalu tekan Simpan.</p>
+      <label class="fld">Tanggal sendback *<input type="date" id="sTanggal" autocomplete="off"></label>
+      <label class="fld">Nama driver *
+        <select id="sDriver"><option value="">Pilih driver</option></select>
+        <input type="text" id="sDriverTeks" placeholder="Ketik nama driver lainnya" autocomplete="off" hidden style="margin-top:8px">
+      </label>
+      <div class="grup">
+        <h2>Barang sendback *</h2>
+        <div id="sBarang"></div>
+        <button type="button" class="tambah" id="btnTambahBarang">+ Tambah barang</button>
+      </div>
+      <label class="fld">Keterangan sendback *
+        <select id="sKet">
+          <option value="">Pilih keterangan</option>
+          <option>Tidak Order</option>
+          <option>Tidak sesuai PO</option>
+          <option>Kurang Barang</option>
+          <option>Salah barang</option>
+        </select>
+      </label>
+      <div class="grup">
+        <div class="lbl">Foto faktur (bisa lebih dari satu)</div>
+        <div class="foto-aksi">
+          <button type="button" class="tambah" id="btnFotoKamera">Ambil foto</button>
+          <button type="button" class="alt" id="btnFotoGaleri">Pilih dari galeri</button>
+        </div>
+        <input type="file" id="fFotoKamera" accept="image/*" capture="environment" hidden>
+        <input type="file" id="fFotoGaleri" accept="image/*" multiple hidden>
+        <div class="thumbs" id="sFoto"></div>
+        <p class="catatan" id="sFotoInfo"></p>
+      </div>
+      <button type="button" class="simpan" id="btnSimpanS">Simpan sendback</button>
+    </div>
+  </div>
+
   <div class="card" id="panelCek" hidden>
     <h2>Kelengkapan dokumen</h2>
     <div class="menunggu" id="menunggu" hidden><span>Menunggu kelengkapan untuk <strong id="menungguKode"></strong></span><button type="button" class="kecil" id="btnBatal">Batal</button></div>
@@ -230,6 +319,7 @@
     <p id="kosong">Belum ada nomor yang discan.</p>
     <ul id="daftar"></ul>
   </div>
+</div>
 </div>
 
 <div id="modalCara" class="modal" role="dialog" aria-modal="true" aria-labelledby="mJudul" hidden>
@@ -273,10 +363,10 @@
     return namaCache;
   }
 
-  async function api(action, data) {
+  async function api(action, data, ms) {
     const user = ambilNama();
     const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), 20000);
+    const timer = setTimeout(() => ctl.abort(), ms || 20000);
     try {
       // Tanpa header khusus agar browser tidak mengirim preflight (CORS) ke Apps Script
       const res = await fetch(API_URL, { method: 'POST', signal: ctl.signal,
@@ -286,22 +376,26 @@
   }
 
   // ---- Tahap scan: storeman, absolute, billing, batal ----
-  const NAMA_TAHAP = { storeman: 'Storeman Berangkat', absolute: 'Absolute Balik', billing: 'Billing Admin', batal: 'Batal DO' };
-  let tahap = ['storeman', 'absolute', 'billing', 'batal'].includes(bacaLokal('tahap')) ? bacaLokal('tahap') : 'storeman';
+  const NAMA_TAHAP = { storeman: 'Storeman Berangkat', absolute: 'Absolute Balik', billing: 'Billing Admin', batal: 'Batal DO', sendback: 'Sendback' };
+  let tahap = ['storeman', 'absolute', 'billing', 'batal', 'sendback'].includes(bacaLokal('tahap')) ? bacaLokal('tahap') : 'storeman';
   function setTahap(t, simpan) {
+    bukaMenu(false);
     tahap = t;
     if (simpan) simpanLokal('tahap', t);
     $('tStore').setAttribute('aria-pressed', String(t === 'storeman'));
     $('tAbs').setAttribute('aria-pressed', String(t === 'absolute'));
     $('tBill').setAttribute('aria-pressed', String(t === 'billing'));
     $('tBatal').setAttribute('aria-pressed', String(t === 'batal'));
+    $('tSend').setAttribute('aria-pressed', String(t === 'sendback'));
     $('panelCek').hidden = t !== 'absolute';
     $('panelBilling').hidden = t !== 'billing';
     $('panelBatal').hidden = t !== 'batal';
+    $('panelSend').hidden = t !== 'sendback';
     // Pindah tab saat masih menunggu pilihan: batalkan, supaya kamera tidak tertahan di tab lain
     if (menunggu && menunggu.tahap !== t) { menunggu = null; renderMenunggu(); }
     if (t === 'billing') segarkanTanggal();
     if (t === 'batal') segarkanTanggalBatal();
+    if (t === 'sendback') segarkanTanggalSend();
     render();
     pesan('');
   }
@@ -309,6 +403,10 @@
   $('tAbs').addEventListener('click', () => setTahap('absolute', true));
   $('tBill').addEventListener('click', () => setTahap('billing', true));
   $('tBatal').addEventListener('click', () => setTahap('batal', true));
+  $('tSend').addEventListener('click', () => setTahap('sendback', true));
+  function bukaMenu(b) { $('side').classList.toggle('buka', b); $('scrim').hidden = !b; }
+  $('btnMenu').addEventListener('click', () => bukaMenu(!$('side').classList.contains('buka')));
+  $('scrim').addEventListener('click', () => bukaMenu(false));
 
   // ---- Absolute Balik, Billing Admin, Batal DO: scan dulu, baru pilih opsi ----
   // Scan hanya menahan nomor di "menunggu". Nomor baru dikirim setelah opsi dipilih / disimpan.
@@ -318,10 +416,10 @@
   const PINTAS = { '1': PILIHAN.tidak, '2': PILIHAN.sj, '3': PILIHAN.ttd, '4': PILIHAN.semua };           // Absolute
   const PINTAS_KAT = { '1': 'Kredit', '2': 'COD 1.5%', '3': 'Batal COD', '4': 'COD' };                    // Billing
   let timerPintas = null;
-  const TEKS_JEDA = { absolute: 'Pilih kelengkapan dokumen dulu', billing: 'Pilih kategori dulu', batal: 'Isi data batal dulu' };
-  const AKSI = { absolute: 'Pilih kelengkapan', billing: 'Pilih kategori', batal: 'Isi data batal' };
-  const ARAHAN = { absolute: 'Pilih kelengkapan dokumen.', billing: 'Pilih kategori.', batal: 'Isi data batal lalu tekan Simpan.' };
-  const PANEL = { absolute: 'panelCek', billing: 'panelBilling', batal: 'panelBatal' };
+  const TEKS_JEDA = { absolute: 'Pilih kelengkapan dokumen dulu', billing: 'Pilih kategori dulu', batal: 'Isi data batal dulu', sendback: 'Isi data sendback dulu' };
+  const AKSI = { absolute: 'Pilih kelengkapan', billing: 'Pilih kategori', batal: 'Isi data batal', sendback: 'Isi data sendback' };
+  const ARAHAN = { absolute: 'Pilih kelengkapan dokumen.', billing: 'Pilih kategori.', batal: 'Isi data batal lalu tekan Simpan.', sendback: 'Lengkapi data sendback lalu tekan Simpan.' };
+  const PANEL = { absolute: 'panelCek', billing: 'panelBilling', batal: 'panelBatal', sendback: 'panelSend' };
 
   function jedaKamera(jeda) {
     if (!scannerJalan || !scanner) return;
@@ -335,7 +433,8 @@
     const mt = menunggu ? menunggu.tahap : '';
     [['absolute', 'menunggu', 'petunjukScan', 'menungguKode'],
      ['billing', 'menungguB', 'petunjukB', 'menungguKodeB'],
-     ['batal', 'menungguT', 'petunjukT', 'menungguKodeT']].forEach((x) => {
+     ['batal', 'menungguT', 'petunjukT', 'menungguKodeT'],
+     ['sendback', 'menungguS', 'petunjukS', 'menungguKodeS']].forEach((x) => {
       const aktif = mt === x[0];
       $(x[1]).hidden = !aktif; $(x[2]).hidden = aktif; $(x[3]).textContent = aktif ? menunggu.kode : '';
     });
@@ -383,7 +482,10 @@
     if (!menunggu) return tolak('Scan nomor DO dulu, baru pilih kategori.', 'belumscan');
     pilihKategori(b.dataset.v);
   }));
-  const batalMenunggu = () => { menunggu = null; renderMenunggu(); pesan(''); };
+  const batalMenunggu = () => {
+    menunggu = null; renderMenunggu(); pesan('');
+  };
+  $('btnBatalS').addEventListener('click', () => batalMenunggu());
   $('btnBatal').addEventListener('click', batalMenunggu);
   $('btnBatalB').addEventListener('click', batalMenunggu);
   $('btnBatalT').addEventListener('click', batalMenunggu);
@@ -396,10 +498,12 @@
   function tampilTeksDriver() { $('driverTeks').hidden = $('driver').value !== LAINNYA; }
   function isiDriver(nama) {
     const list = nama.filter((n) => n.toUpperCase() !== LAINNYA).concat(LAINNYA);
-    const sel = $('driver'), lama = sel.value;
-    sel.replaceChildren(new Option('Pilih driver', ''), ...list.map((n) => new Option(n, n)));
-    if (list.includes(lama)) sel.value = lama;
-    tampilTeksDriver();
+    ['driver', 'sDriver'].forEach((id) => {
+      const sel = $(id), lama = sel.value;
+      sel.replaceChildren(new Option('Pilih driver', ''), ...list.map((n) => new Option(n, n)));
+      if (list.includes(lama)) sel.value = lama;
+    });
+    tampilTeksDriver(); tampilTeksDriverS();
   }
   $('driver').addEventListener('change', tampilTeksDriver);
   const nilaiDriver = () => ($('driver').value === LAINNYA ? $('driverTeks').value.trim().toUpperCase() : $('driver').value.trim());
@@ -456,6 +560,142 @@
   }
   $('btnSimpan').addEventListener('click', simpanBatal);
 
+  // ---- Sendback: scan PM, isi form, foto ke Drive, data ke sheet SEND BACK ----
+  // Tidak masuk antrean offline: foto terlalu besar untuk disimpan di perangkat. Kalau gagal, form tetap terisi dan bisa dikirim ulang.
+  const MAX_FOTO = 5, MAKS_SISI = 1280;
+  let fotoBaru = [];          // data URL JPEG hasil kompres (belum diunggah)
+  let sedangKirimSend = false, elSebelum = null, tanggalSendManual = false;
+
+  function tampilTeksDriverS() { $('sDriverTeks').hidden = $('sDriver').value !== LAINNYA; }
+  $('sDriver').addEventListener('change', tampilTeksDriverS);
+
+  function segarkanTanggalSend() {
+    if (!tanggalSendManual || !$('sTanggal').value) { $('sTanggal').value = isoHari(0); tanggalSendManual = false; }
+  }
+  $('sTanggal').addEventListener('change', () => { tanggalSendManual = $('sTanggal').value !== isoHari(0); $('sTanggal').blur(); pesan(''); });
+
+
+  // Daftar barang
+  function tambahBarang(nama, qty) {
+    const row = document.createElement('div'); row.className = 'brg';
+    const n = document.createElement('input'); n.type = 'text'; n.className = 'b-nama'; n.placeholder = 'Nama item barang'; n.autocomplete = 'off'; n.value = nama || '';
+    const q = document.createElement('input'); q.type = 'text'; q.className = 'b-qty'; q.inputMode = 'numeric'; q.placeholder = 'Pcs'; q.autocomplete = 'off'; q.value = qty ? String(qty) : '';
+    q.addEventListener('input', () => { q.value = q.value.replace(/\D/g, ''); });
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'b-hapus'; x.textContent = '×'; x.setAttribute('aria-label', 'Hapus barang');
+    x.addEventListener('click', () => { if ($('sBarang').children.length > 1) row.remove(); else { n.value = ''; q.value = ''; } });
+    row.append(n, q, x);
+    $('sBarang').append(row);
+  }
+  $('btnTambahBarang').addEventListener('click', () => { tambahBarang(); const k = $('sBarang').lastElementChild; if (k) k.querySelector('input').focus(); });
+
+  // Foto: dikecilkan di perangkat (maks 1280 px, JPEG) supaya cepat terkirim
+  function kompres(file) {
+    return new Promise((res, rej) => {
+      const img = new Image(), url = URL.createObjectURL(file);
+      img.onload = () => {
+        const sk = Math.min(1, MAKS_SISI / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * sk); c.height = Math.round(img.height * sk);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        res(c.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('foto')); };
+      img.src = url;
+    });
+  }
+  function tombolX(fn) {
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'x'; x.textContent = '×'; x.setAttribute('aria-label', 'Hapus foto');
+    x.addEventListener('click', fn);
+    return x;
+  }
+  function renderFoto() {
+    const kids = [];
+    fotoBaru.forEach((d, i) => {
+      const c = document.createElement('span'); c.className = 'chipfoto';
+      const im = document.createElement('img'); im.src = d; im.alt = 'Foto ' + (i + 1);
+      c.append(im, tombolX(() => { fotoBaru.splice(i, 1); renderFoto(); }));
+      kids.push(c);
+    });
+    $('sFoto').replaceChildren(...kids);
+    const n = fotoBaru.length;
+    $('sFotoInfo').textContent = n + ' dari ' + MAX_FOTO + ' foto.' + (n < MAX_FOTO ? ' Tekan tombol lagi untuk menambah foto.' : '');
+  }
+  async function tambahFoto(files) {
+    const berkas = Array.from(files || []);
+    if (!berkas.length) return;
+    const sisa = MAX_FOTO - fotoBaru.length;
+    if (sisa <= 0) return tolak('Maksimal ' + MAX_FOTO + ' foto per kasus.', 'foto');
+    pesan('Memproses foto...');
+    let gagal = 0;
+    for (const f of berkas.slice(0, sisa)) { try { fotoBaru.push(await kompres(f)); } catch (e) { gagal++; } }
+    renderFoto();
+    if (berkas.length > sisa) tolak('Hanya ' + sisa + ' foto yang ditambahkan, maksimal ' + MAX_FOTO + '.', 'foto');
+    else if (gagal) tolak('Ada foto yang tidak bisa dibaca.', 'foto');
+    else pesan('');
+  }
+  $('btnFotoKamera').addEventListener('click', () => $('fFotoKamera').click());
+  $('btnFotoGaleri').addEventListener('click', () => $('fFotoGaleri').click());
+  ['fFotoKamera', 'fFotoGaleri'].forEach((id) => $(id).addEventListener('change', (e) => { tambahFoto(e.target.files); e.target.value = ''; }));
+
+  function resetFormSend() {
+    $('sKet').value = '';
+    $('sBarang').replaceChildren(); tambahBarang();
+    fotoBaru = []; renderFoto();
+    tanggalSendManual = false; segarkanTanggalSend();
+  }
+
+  async function simpanSend() {
+    if (sedangKirimSend) return;
+    const pm = menunggu && menunggu.tahap === 'sendback' ? menunggu.kode.toUpperCase() : '', tanggal = $('sTanggal').value;
+    const driver = $('sDriver').value, lain = $('sDriverTeks').value.trim();
+    const items = Array.from($('sBarang').children).map((r) => ({
+      namaItem: r.querySelector('.b-nama').value.trim(), qty: Number(r.querySelector('.b-qty').value) || 0 })).filter((it) => it.namaItem || it.qty);
+    const ket = $('sKet').value;
+    if (!tanggal) return tolak('Isi tanggal sendback dulu.', 'pilihan');
+    if (!pm) return tolak('Scan nomor PM dulu.', 'pilihan');
+    if (!driver) return tolak('Pilih nama driver dulu.', 'pilihan');
+    if (driver === LAINNYA && !lain) return tolak('Ketik nama driver dulu.', 'pilihan');
+    if (!items.length) return tolak('Isi minimal satu barang.', 'pilihan');
+    const buruk = items.find((it) => !it.namaItem || it.qty <= 0);
+    if (buruk) return tolak(buruk.namaItem ? 'Isi jumlah pcs untuk ' + buruk.namaItem + '.' : 'Isi nama barang yang jumlahnya sudah diisi.', 'pilihan');
+    if (!ket) return tolak('Pilih keterangan sendback dulu.', 'pilihan');
+    if (!navigator.onLine) return tolak('Tidak ada sinyal. Sendback dengan foto tidak bisa diantre, coba lagi saat tersambung.', 'offline');
+
+    sedangKirimSend = true;
+    $('btnSimpanS').disabled = true; $('btnSimpanS').textContent = 'Menyimpan...';
+    pesan('Menyimpan sendback dan mengunggah foto...');
+    try {
+      const res = await api('sendback_simpan', {
+        modeAksi: 'baru', tanggal: tanggal, nomorPm: pm, driver: driver, driverLainnya: lain,
+        items: items, keterangan: ket, fotoBase64List: fotoBaru
+      }, 120000);
+      if (!res || !res.ok) { tolak((res && res.message) || 'Gagal menyimpan.', 'gagalS'); return; }
+
+      if (menunggu && menunggu.tahap === 'sendback') {
+        kunciTerlihat = 'sendback|' + menunggu.kode.toUpperCase(); waktuTerlihat = Date.now();
+        menunggu = null; renderMenunggu();
+      }
+      const ada = daftar.find(sama('sendback', pm));
+      if (ada && bisaHapus(ada)) daftar.splice(daftar.indexOf(ada), 1);
+      const namaDriver = driver === LAINNYA ? lain.toUpperCase() : driver;
+      daftar.unshift({ kode: pm, tahap: 'sendback', status: 'ok',
+        ket: namaDriver + ', ' + ket + ', ' + items.length + ' barang, ' + fotoBaru.length + ' foto, ' + fmtTgl(tanggal) });
+      render();
+      bunyi('sukses');
+      resetFormSend();
+      pesan(res.message || 'Sendback tersimpan.', 'ok');
+    } catch (e) {
+      tolak('Gagal terhubung ke server. Cek di Rekap apakah data sudah masuk sebelum mengirim ulang.', 'gagalS');
+    } finally {
+      sedangKirimSend = false;
+      $('btnSimpanS').disabled = false;
+      $('btnSimpanS').textContent = 'Simpan sendback';
+    }
+  }
+  $('btnSimpanS').addEventListener('click', simpanSend);
+
+
   // ---- Released Billing: tanggal dan kategori ----
   let tanggalManual = false;
   const isoHari = (geser) => {
@@ -481,14 +721,14 @@
     tanggalManual = $('tanggal').value !== isoHari(0);
     tandaiCepat(); $('tanggal').blur(); pesan('');
   });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) { segarkanTanggal(); segarkanTanggalBatal(); } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { segarkanTanggal(); segarkanTanggalBatal(); segarkanTanggalSend(); } });
 
   // ---- Tampilan ----
   function pesan(teks, jenis) { $('pesan').textContent = teks || ''; $('pesan').className = jenis || ''; }
 
   const LABEL = { proses: 'Memproses', ok: 'Diterima', sudah: 'Sudah diterima', kurang: 'Tidak lengkap', update: 'Diperbarui', periksa: 'Periksa', tidak: 'Tidak ditemukan', antre: 'Menunggu kirim', gagal: 'Gagal' };
   const labelStatus = (d) => {
-    if (d.tahap === 'billing' || d.tahap === 'batal') return d.status === 'ok' ? 'Tercatat' : d.status === 'sudah' ? 'Sudah tercatat' : LABEL[d.status];
+    if (d.tahap === 'billing' || d.tahap === 'batal' || d.tahap === 'sendback') return d.status === 'ok' ? 'Tercatat' : d.status === 'sudah' ? 'Sudah tercatat' : LABEL[d.status];
     return (d.status === 'ok' && d.tahap === 'absolute') ? 'Lengkap' : (d.status === 'sudah' && d.tahap === 'absolute') ? 'Sudah lengkap' : LABEL[d.status];
   };
   const sama = (t, k) => (d) => (d.tahap || 'storeman') === t && d.kode.toUpperCase() === k.toUpperCase();
@@ -501,6 +741,7 @@
     $('kosong').hidden = lihat.length > 0;
     $('jumlah').textContent = lihat.length + ' discan';
     $('judulHasil').textContent = 'Hasil scan: ' + NAMA_TAHAP[tahap];
+    $('judulScan').textContent = 'N2N - ' + NAMA_TAHAP[tahap];
     $('btnHapus').hidden = !lihat.some(bisaHapus);
     $('daftar').replaceChildren(...lihat.map((d) => {
       const li = document.createElement('li');
@@ -860,13 +1101,18 @@
       const pilih = billing ? PINTAS_KAT[e.key] : menunggu.tahap === 'absolute' ? PINTAS[e.key] : null;
       if (pilih) timerPintas = setTimeout(() => (billing ? pilihKategori(pilih) : pilihKelengkapan(pilih)), 160);
     }
-    if (jeda > 150) { buf = ''; tMulai = now; fotoSebelum = fotoBatal(); }
+    if (jeda > 150) {
+      buf = ''; tMulai = now; fotoSebelum = fotoBatal();
+      const t = e.target;
+      elSebelum = (t && /^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName) && t.type !== 'file') ? { el: t, v: t.value } : null;
+    }
     tBuf = now;
     if (e.key === 'Enter') {
       const rata = buf.length ? (now - tMulai) / buf.length : 999;
       if (buf.length >= 6 && rata < 60) {
         e.preventDefault();
         pulihBatal(fotoSebelum);
+        if (elSebelum && elSebelum.el) elSebelum.el.value = elSebelum.v;
         tutupModal();
         if (cara !== 'alat') setCara('alat', true);
         proses(buf);
@@ -896,6 +1142,7 @@
     renderMenunggu();
     isiDriver(DRIVER_AWAL);
     segarkanTanggalBatal();
+    tambahBarang(); renderFoto(); segarkanTanggalSend();
     $('formManual').hidden = cara !== 'ketik';
     $('btnSuara').textContent = suaraNyala ? 'Suara: nyala' : 'Suara: mati';
     bukaModal();

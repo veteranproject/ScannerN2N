@@ -217,12 +217,12 @@
     <div class="menunggu" id="menunggu" hidden><span>Menunggu kelengkapan untuk <strong id="menungguKode"></strong></span><button type="button" class="kecil" id="btnBatal">Batal</button></div>
     <p class="catatan" id="petunjukScan" style="margin:0 0 10px">Scan nomor DO dulu, lalu pilih kelengkapan dokumen di bawah.</p>
     <div class="cekgrid">
+      <button type="button" class="cek" data-k="tidak" aria-pressed="false">Tidak lengkap</button>
       <button type="button" class="cek" data-k="sj" aria-pressed="false">Surat Jalan</button>
       <button type="button" class="cek" data-k="ttd" aria-pressed="false">TTD &amp; Stempel</button>
       <button type="button" class="cek" data-k="semua" aria-pressed="false">Lengkap semua</button>
-      <button type="button" class="cek" data-k="tidak" aria-pressed="false">Tidak lengkap</button>
     </div>
-    <p class="catatan">Urutan: scan nomor DO dulu, baru ketuk kelengkapan dokumen. Selama menunggu pilihan, kamera berhenti membaca barcode, dan data dikirim ke sheet setelah kelengkapan dipilih. Pintasan keyboard: 1 = hanya Surat Jalan, 2 = hanya TTD &amp; Stempel, 3 = keduanya lengkap, 4 = tidak lengkap. Dokumen yang tidak dipilih dibiarkan kosong (tidak tercentang) di sheet, begitu juga Diterima Absolute. Tidak lengkap mengosongkan Surat Jalan dan TTD &amp; Stempel. Nomor yang sama boleh discan ulang kapan saja untuk memperbarui kelengkapan. Kalau sudah lengkap sebelumnya, hasilnya "Sudah lengkap" dan data lama tidak ditimpa.</p>
+    <p class="catatan">Pintasan keyboard: 1 = Tidak lengkap, 2 = Surat Jalan, 3 = TTD &amp; Stempel, 4 = Lengkap semua.</p>
   </div>
 
   <div class="card">
@@ -315,7 +315,7 @@
   // Selama menunggu, kamera dijeda dan semua pembacaan barcode diabaikan.
   let menunggu = null;   // {kode, waktu, tahap}
   const PILIHAN = { sj: { sj: true }, ttd: { ttd: true }, semua: { sj: true, ttd: true }, tidak: { tidak: true } };
-  const PINTAS = { '1': PILIHAN.sj, '2': PILIHAN.ttd, '3': PILIHAN.semua, '4': PILIHAN.tidak };           // Absolute
+  const PINTAS = { '1': PILIHAN.tidak, '2': PILIHAN.sj, '3': PILIHAN.ttd, '4': PILIHAN.semua };           // Absolute
   const PINTAS_KAT = { '1': 'Kredit', '2': 'COD 1.5%', '3': 'Batal COD', '4': 'COD' };                    // Billing
   let timerPintas = null;
   const TEKS_JEDA = { absolute: 'Pilih kelengkapan dokumen dulu', billing: 'Pilih kategori dulu', batal: 'Isi data batal dulu' };

@@ -20,7 +20,6 @@
     button:focus-visible, input:focus-visible { outline:2px solid var(--p-600); outline-offset:2px; }
     .app { max-width:520px; margin:0 auto; }
 
-    /* Header bergaya diagonal */
     header { position:relative; overflow:hidden; margin:12px 0; padding:24px 20px 22px; color:#fff; border-radius:18px;
       background:linear-gradient(135deg, var(--p-600), var(--p-800)); }
     header::before, header::after { content:""; position:absolute; pointer-events:none; transform:rotate(30deg); }
@@ -30,7 +29,6 @@
     h1 { margin:0; font-size:1.45rem; font-weight:800; letter-spacing:-.01em; }
     header p { max-width:34ch; margin:4px 0 0; color:rgba(255,255,255,.82); font-size:.88rem; }
 
-    /* Tab tahap */
     .tabs { display:flex; gap:4px; background:var(--card); border:1px solid var(--line); padding:4px; border-radius:14px; margin-bottom:12px; position:sticky; top:8px; z-index:20; box-shadow:0 4px 14px rgba(74,70,185,.10); }
     .tab { flex:1; border:none; padding:10px 2px; border-radius:10px; font-weight:700; font-size:.78rem; line-height:1.2; background:transparent; color:var(--ink-2); }
     .tab[aria-pressed="true"] { background:linear-gradient(135deg, var(--p-600), var(--p-700)); color:#fff; }
@@ -42,7 +40,6 @@
     .tag { display:inline-block; margin-left:6px; padding:1px 8px; font-size:.74rem; font-weight:600; color:var(--p-800); background:var(--p-100); border-radius:999px; vertical-align:1px; }
     .catatan { margin:10px 0 0; font-size:.82rem; line-height:1.45; color:var(--ink-2); }
 
-    /* Kelengkapan Absolute: 4 tombol sejajar, bentuknya sama dengan kategori Billing */
     .cekgrid { display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; }
     .cek { --c:#2563eb; --t:#eff6ff; --b:#bfdbfe;
       padding:12px 2px; font-size:.82rem; font-weight:700; line-height:1.2; color:var(--c); background:var(--t); border:1.5px solid var(--b); border-radius:12px; }
@@ -59,12 +56,10 @@
     .menunggu strong { word-break:break-all; }
     .menunggu .kecil { margin-left:auto; }
 
-    /* Batal DO */
     .fld { display:block; margin-bottom:10px; font-size:.82rem; font-weight:600; color:var(--ink-2); }
     .fld input, .fld select { display:block; width:100%; margin-top:5px; padding:10px 12px; font:inherit; font-weight:400; color:var(--ink); background:#fff; border:1px solid #cfcde6; border-radius:10px; }
     .simpan { display:block; width:100%; margin-top:4px; padding:13px; border:none; border-radius:12px; font-weight:700; color:#fff; background:linear-gradient(135deg, var(--p-600), var(--p-700)); }
 
-    /* Billing */
     .tgl { display:block; margin-bottom:10px; font-size:.82rem; font-weight:600; color:var(--ink-2); }
     .tgl input { display:block; width:100%; margin-top:5px; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #cfcde6; border-radius:10px; }
     .cepat { display:flex; gap:6px; margin:-2px 0 12px; }
@@ -79,7 +74,6 @@
     .kat[data-v="COD"]       { --c:#0f766e; --t:#f0fdfa; --b:#5eead4; }
     .kat[aria-pressed="true"] { color:#fff; background:var(--c); border-color:var(--c); }
 
-    /* Kamera */
     #kamera { position:relative; height:160px; overflow:hidden; background:var(--p-900); border-radius:14px; cursor:pointer; }
     #reader, #reader__scan_region { width:100%; height:100% !important; min-height:0 !important; border:none !important; }
     #reader video { display:block; width:100% !important; height:100% !important; object-fit:cover; }
@@ -93,7 +87,6 @@
     @keyframes sapu { from { top:22%; } to { top:78%; } }
     @media (prefers-reduced-motion: reduce) { #kamera.aktif .garis { animation:none; } }
 
-    /* Alat scanner USB */
     .alat { display:flex; flex-direction:column; align-items:center; gap:4px; padding:24px 14px; text-align:center; background:var(--p-50); border:1px dashed var(--p-300); border-radius:14px; }
     .alat strong { font-size:1.05rem; color:var(--p-800); }
     .alat span { font-size:.88rem; color:var(--ink-2); }
@@ -108,13 +101,11 @@
     #pesan.err { color:var(--merah); }
     #pesan.ok { color:var(--hijau); }
 
-    /* Input manual */
     .manual { display:flex; gap:8px; margin-top:10px; }
     .manual input { flex:1; min-width:0; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #cfcde6; border-radius:10px; }
     .manual button { padding:10px 20px; border:none; background:var(--p-600); color:#fff; border-radius:10px; font-weight:700; }
     .manual button:hover { background:var(--p-700); }
 
-    /* Hasil scan */
     #kosong { margin:0; font-size:.9rem; color:var(--ink-2); }
     #daftar { list-style:none; margin:0; padding:0; }
     #daftar li { display:flex; gap:10px; justify-content:space-between; align-items:flex-start; padding:9px 0; border-top:1px solid var(--line); }
@@ -128,7 +119,6 @@
     .lencana.tidak, .lencana.gagal { color:var(--merah); background:var(--merah-bg); }
     .lencana.proses, .lencana.antre { color:var(--ink-2); background:var(--p-100); }
 
-    /* Pop-up cara scan */
     .modal { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(43, 40, 115, .6); }
     .kotak { width:100%; max-width:400px; padding:20px; background:#fff; border-radius:16px; }
     .kotak h3 { margin:0 0 6px; font-size:1.05rem; color:var(--p-800); }
@@ -204,8 +194,8 @@
     <p class="catatan" id="petunjukT" style="margin:0 0 10px">Scan nomor DO dulu, lalu isi data batal dan tekan Simpan.</p>
     <label class="fld">Tanggal batal DO *<input type="date" id="tanggalBatal" autocomplete="off"></label>
     <label class="fld">Nama driver *
-      <select id="driver" hidden><option value="">Pilih driver</option></select>
-      <input type="text" id="driverTeks" placeholder="Ketik nama driver" autocomplete="off">
+      <select id="driver"><option value="">Pilih driver</option></select>
+      <input type="text" id="driverTeks" placeholder="Ketik nama driver lainnya" autocomplete="off" hidden style="margin-top:8px">
     </label>
     <label class="fld">Nominal faktur (Rp) *<input type="text" id="nominal" inputmode="numeric" placeholder="Contoh: 1,500,000" autocomplete="off"></label>
     <label class="fld">Alasan batal *
@@ -295,7 +285,7 @@
     } finally { clearTimeout(timer); }
   }
 
-  // ---- Tahap scan: storeman, absolute, billing ----
+  // ---- Tahap scan: storeman, absolute, billing, batal ----
   const NAMA_TAHAP = { storeman: 'Storeman Berangkat', absolute: 'Absolute Balik', billing: 'Billing Admin', batal: 'Batal DO' };
   let tahap = ['storeman', 'absolute', 'billing', 'batal'].includes(bacaLokal('tahap')) ? bacaLokal('tahap') : 'storeman';
   function setTahap(t, simpan) {
@@ -308,7 +298,7 @@
     $('panelCek').hidden = t !== 'absolute';
     $('panelBilling').hidden = t !== 'billing';
     $('panelBatal').hidden = t !== 'batal';
-    // Pindah dari Absolute saat masih menunggu kelengkapan: batalkan, supaya kamera tidak tertahan di tab lain
+    // Pindah tab saat masih menunggu pilihan: batalkan, supaya kamera tidak tertahan di tab lain
     if (menunggu && menunggu.tahap !== t) { menunggu = null; renderMenunggu(); }
     if (t === 'billing') segarkanTanggal();
     if (t === 'batal') segarkanTanggalBatal();
@@ -320,13 +310,11 @@
   $('tBill').addEventListener('click', () => setTahap('billing', true));
   $('tBatal').addEventListener('click', () => setTahap('batal', true));
 
-  // ---- Absolute Balik dan Billing Admin: scan dulu, baru pilih opsi ----
-  // Scan hanya menahan nomor di "menunggu". Nomor baru dikirim setelah salah satu tombol opsi diketuk
-  // (kelengkapan dokumen di Absolute, kategori di Billing). Selama menunggu, kamera dijeda dan semua
-  // pembacaan barcode diabaikan.
+  // ---- Absolute Balik, Billing Admin, Batal DO: scan dulu, baru pilih opsi ----
+  // Scan hanya menahan nomor di "menunggu". Nomor baru dikirim setelah opsi dipilih / disimpan.
+  // Selama menunggu, kamera dijeda dan semua pembacaan barcode diabaikan.
   let menunggu = null;   // {kode, waktu, tahap}
   const PILIHAN = { sj: { sj: true }, ttd: { ttd: true }, semua: { sj: true, ttd: true }, tidak: { tidak: true } };
-  // Pintasan keyboard (angka atas maupun numpad)
   const PINTAS = { '1': PILIHAN.sj, '2': PILIHAN.ttd, '3': PILIHAN.semua, '4': PILIHAN.tidak };           // Absolute
   const PINTAS_KAT = { '1': 'Kredit', '2': 'COD 1.5%', '3': 'Batal COD', '4': 'COD' };                    // Billing
   let timerPintas = null;
@@ -335,7 +323,6 @@
   const ARAHAN = { absolute: 'Pilih kelengkapan dokumen.', billing: 'Pilih kategori.', batal: 'Isi data batal lalu tekan Simpan.' };
   const PANEL = { absolute: 'panelCek', billing: 'panelBilling', batal: 'panelBatal' };
 
-  // Jeda / lanjutkan kamera. Aman dipanggil kapan saja: kalau kamera tidak sedang jalan, tidak terjadi apa-apa.
   function jedaKamera(jeda) {
     if (!scannerJalan || !scanner) return;
     try { if (jeda) scanner.pause(true); else scanner.resume(); } catch (e) {}
@@ -359,7 +346,6 @@
   function ambilMenunggu(t, ket) {
     const m = menunggu;
     menunggu = null;
-    // Nomor yang barusan diproses tidak langsung terbaca lagi kalau barcodenya masih di depan kamera
     kunciTerlihat = t + '|' + m.kode.toUpperCase(); waktuTerlihat = Date.now();
     renderMenunggu();                                   // kamera lanjut membaca
     const ada = daftar.find(sama(t, m.kode));
@@ -380,7 +366,7 @@
 
   function pilihKategori(kat) {
     if (!menunggu || menunggu.tahap !== 'billing') return false;
-    const tanggalIso = $('tanggal').value;              // tanggal yang tampil saat kategori dipilih
+    const tanggalIso = $('tanggal').value;
     if (!tanggalIso) return tolak('Pilih tanggal dulu sebelum memilih kategori.', 'pilihan');
     const m = ambilMenunggu('billing', kat + ', ' + fmtTgl(tanggalIso));
     antrean.push({ kode: m.kode, waktu: m.waktu, tahap: 'billing', tanggal: tanggalIso, kategori: kat });
@@ -403,23 +389,25 @@
   $('btnBatalT').addEventListener('click', batalMenunggu);
 
   // ---- Batal DO: scan dulu, isi data batal, lalu Simpan ----
-  // Daftar driver diambil dari sheet "Driver" (disimpan di perangkat agar tetap ada saat offline).
-  // Kalau daftarnya kosong, kolom driver berupa isian teks biasa.
-  let drivers = [];
+  // Driver berupa dropdown. Daftar awal ada di DRIVER_AWAL; kalau sheet "Driver" berisi data, daftar itu yang dipakai.
+  // "LAINNYA" selalu paling bawah; bila dipilih, muncul kolom ketik nama driver.
+  const DRIVER_AWAL = ['ALFIAN', 'ALIF', 'IMAM', 'SUGANDA', 'WAHYU', 'ARDIAN', 'JEFRI', 'DANI', 'SURYA', 'RIFKY'];
+  const LAINNYA = 'LAINNYA';
+  function tampilTeksDriver() { $('driverTeks').hidden = $('driver').value !== LAINNYA; }
   function isiDriver(nama) {
-    drivers = nama;
+    const list = nama.filter((n) => n.toUpperCase() !== LAINNYA).concat(LAINNYA);
     const sel = $('driver'), lama = sel.value;
-    sel.replaceChildren(new Option('Pilih driver', ''), ...nama.map((n) => new Option(n, n)));
-    if (nama.includes(lama)) sel.value = lama;
-    sel.hidden = !nama.length;
-    $('driverTeks').hidden = nama.length > 0;
+    sel.replaceChildren(new Option('Pilih driver', ''), ...list.map((n) => new Option(n, n)));
+    if (list.includes(lama)) sel.value = lama;
+    tampilTeksDriver();
   }
-  const nilaiDriver = () => (drivers.length ? $('driver').value : $('driverTeks').value).trim();
+  $('driver').addEventListener('change', tampilTeksDriver);
+  const nilaiDriver = () => ($('driver').value === LAINNYA ? $('driverTeks').value.trim().toUpperCase() : $('driver').value.trim());
   async function muatDriver() {
     try { const l = JSON.parse(bacaLokal('daftar_driver') || '[]'); if (Array.isArray(l) && l.length) isiDriver(l); } catch (e) {}
     try {
       const res = await api('driver', {});
-      if (res && res.ok && Array.isArray(res.driver)) { isiDriver(res.driver); simpanLokal('daftar_driver', JSON.stringify(res.driver)); }
+      if (res && res.ok && Array.isArray(res.driver) && res.driver.length) { isiDriver(res.driver); simpanLokal('daftar_driver', JSON.stringify(res.driver)); }
     } catch (e) {}
   }
 
@@ -446,6 +434,7 @@
   const pulihBatal = (f) => {
     if (!f) return;
     $('tanggalBatal').value = f.t; $('driver').value = f.d; $('driverTeks').value = f.dt; $('nominal').value = f.n; $('alasan').value = f.a;
+    tampilTeksDriver();
   };
   let fotoSebelum = null;
 
@@ -453,7 +442,7 @@
     if (!menunggu || menunggu.tahap !== 'batal') return tolak('Scan nomor DO dulu, baru isi data batal.', 'belumscan');
     const tanggalIso = $('tanggalBatal').value, driver = nilaiDriver(), nominal = nilaiNominal(), alasan = $('alasan').value;
     if (!tanggalIso) return tolak('Isi tanggal batal DO dulu.', 'pilihan');
-    if (!driver) return tolak('Pilih nama driver dulu.', 'pilihan');
+    if (!driver) return tolak($('driver').value === LAINNYA ? 'Ketik nama driver dulu.' : 'Pilih nama driver dulu.', 'pilihan');
     if (!nominal) return tolak('Isi nominal faktur dulu.', 'pilihan');
     if (!alasan) return tolak('Pilih alasan batal dulu.', 'pilihan');
     const m = ambilMenunggu('batal', alasan + ', ' + driver + ', Rp ' + ribuan(nominal) + ', ' + fmtTgl(tanggalIso));
@@ -468,8 +457,6 @@
   $('btnSimpan').addEventListener('click', simpanBatal);
 
   // ---- Released Billing: tanggal dan kategori ----
-  // Kategori dipilih setelah scan, jadi tidak disimpan. Tanggal otomatis terisi hari ini (bukan tanggal lama),
-  // dan ikut berganti sendiri bila halaman dibiarkan terbuka melewati tengah malam, selama belum diubah manual.
   let tanggalManual = false;
   const isoHari = (geser) => {
     const d = new Date(); d.setDate(d.getDate() + (geser || 0));
@@ -510,7 +497,6 @@
   const bisaHapus = (d) => d.status !== 'proses' && d.status !== 'antre';
 
   function render() {
-    // Hanya tampilkan hasil milik tab yang sedang aktif
     const lihat = daftar.filter((d) => (d.tahap || 'storeman') === tahap);
     $('kosong').hidden = lihat.length > 0;
     $('jumlah').textContent = lihat.length + ' discan';
@@ -550,10 +536,10 @@
     if (t === 'batal') {
       const rincian = (x) => (x.alasan || '') + ', ' + (x.driver || '') + ', Rp ' + ribuan(x.nominal) + (x.tanggal ? ', ' + x.tanggal : '');
       const info = rincian(h);
-      if (h.status === 'ok') item.ket = info;
-      else if (h.status === 'periksa') item.ket = info + '. Tersimpan, tetapi nomor ini tidak ada di Master Data. Periksa kembali nomornya.';
+      if (h.status === 'ok') item.ket = info + '. Masuk Master Data dan Pengajuan Batal COD.';
       else if (h.status === 'update') item.ket = 'Diperbarui: ' + info + (h.lama ? ' (sebelumnya ' + rincian(h.lama) + ')' : '');
-      else if (h.status === 'sudah') item.ket = 'Sudah tercatat, tidak ada perubahan: ' + info + (h.user ? ', oleh ' + h.user : '');
+      else if (h.status === 'sudah') item.ket = 'Sudah tercatat, tidak ada perubahan: ' + info;
+      else if (h.status === 'tidak') item.ket = 'Nomor ini tidak ada di kolom NO DOCUMENT';
       else item.ket = h.pesan || 'Data tidak valid.';
       return;
     }
@@ -631,9 +617,7 @@
   }
 
   // Semua scan masuk antrean. Hanya satu pengiriman berjalan sekaligus, dan setiap pengiriman
-  // membawa semua scan yang menumpuk, jadi scan berikutnya tidak perlu menunggu hasil sebelumnya.
-  // Storeman/Absolute dikirim lewat aksi 'terima', Billing lewat 'billing', Batal DO lewat 'batal' (kelompok yang berdiri sendiri,
-  // jadi satu kelompok yang gagal tidak menahan yang lain).
+  // membawa semua scan yang menumpuk. Storeman/Absolute lewat aksi 'terima', Billing 'billing', Batal DO 'batal'.
   async function bilasAntrean() {
     if (sedangBilas) return;
     sedangBilas = true;
@@ -651,7 +635,6 @@
   }
 
   // ---- Suara ----
-  // Browser hanya mengizinkan suara setelah ada ketukan/tombol dari pengguna, jadi audio "dibuka" pada interaksi pertama.
   let suaraNyala = bacaLokal('suara') !== '0';
   let audio = null;
   function siapAudio() {
@@ -664,10 +647,10 @@
 
   // Tiap nada: [frekuensi Hz, mulai (detik), durasi (detik), bentuk gelombang]
   const SUARA = {
-    scan:      [[1100, 0, 0.09, 'square']],                                  // barcode terbaca
-    sukses:    [[660, 0, 0.10, 'sine'], [990, 0.11, 0.16, 'sine']],          // tersimpan di sheet (naik)
-    peringatan:[[520, 0, 0.12, 'triangle'], [520, 0.17, 0.12, 'triangle']],  // tersimpan tetapi perlu perhatian / sudah ada
-    galat:     [[220, 0, 0.32, 'sawtooth']]                                  // ditolak atau gagal
+    scan:      [[1100, 0, 0.09, 'square']],
+    sukses:    [[660, 0, 0.10, 'sine'], [990, 0.11, 0.16, 'sine']],
+    peringatan:[[520, 0, 0.12, 'triangle'], [520, 0.17, 0.12, 'triangle']],
+    galat:     [[220, 0, 0.32, 'sawtooth']]
   };
   function bunyi(nama) {
     if (!suaraNyala) return;
@@ -703,8 +686,7 @@
   }
   $('btnSuara').addEventListener('click', () => setSuara(!suaraNyala));
 
-  // Penolakan lokal (tanggal/kategori kosong, masih diproses): bunyi galat hanya sekali per kunci,
-  // supaya barcode yang masih di depan kamera tidak membunyikan alarm terus-menerus.
+  // Penolakan lokal: bunyi galat hanya sekali per kunci supaya barcode di depan kamera tidak membunyikan alarm terus
   let galatKunci = '', galatWaktu = 0;
   function tolak(teks, kunci) {
     pesan(teks, 'err');
@@ -712,7 +694,6 @@
     if (kunci !== galatKunci || n - galatWaktu > 10000) { bunyi('galat'); galatKunci = kunci; galatWaktu = n; }
   }
 
-  // Bunyi pendek dan kedipan bingkai: tanda scan masuk, langsung arahkan ke barcode berikutnya
   function tandaScan() {
     if (navigator.vibrate) navigator.vibrate(80);
     bunyi('scan');
@@ -727,18 +708,14 @@
     const kode = String(teks).trim();
     if (!kode) return;
 
-    // Absolute / Billing: selama menunggu pilihan opsi, kamera tidak menangkap apa pun.
-    // Alat USB dan ketik manual tetap diberi tahu kenapa ditolak.
     if (menunggu) {
       if (dariKamera) return;
       if (menunggu.kode.toUpperCase() === kode.toUpperCase()) return;
       return tolak(AKSI[menunggu.tahap] + ' untuk ' + menunggu.kode + ' dulu (atau ketuk Batal) sebelum scan nomor berikutnya.', 'menunggu');
     }
 
-    // Billing: tanggal wajib ada. Kategori dipilih setelah scan.
     if (tahap === 'billing' && !$('tanggal').value) return tolak('Pilih tanggal dulu sebelum scan Billing.', 'pilihan');
 
-    // Pengaman pembacaan ganda (lihat JEDA_LEPAS dan JEDA_SAMA). Scan ulang nomor yang sama diperbolehkan.
     const sekarang = Date.now();
     const kunci = tahap + '|' + kode.toUpperCase();
     if (dariKamera) {
@@ -750,7 +727,6 @@
       kunciTerakhir = kunci; waktuTerakhir = sekarang;
     }
 
-    // Nomor yang sama masih dalam proses kirim: tunggu hasilnya dulu, lalu boleh discan ulang
     const ada = daftar.find(sama(tahap, kode));
     if (ada && !bisaHapus(ada)) return tolak(kode + ' masih diproses. Tunggu hasilnya, lalu scan ulang.', kunci);
 
@@ -765,7 +741,7 @@
     }
 
     pesan('');
-    if (ada) daftar.splice(daftar.indexOf(ada), 1);      // hasil lama diganti hasil scan terbaru
+    if (ada) daftar.splice(daftar.indexOf(ada), 1);
     daftar.unshift({ kode: kode, tahap: tahap, status: 'proses', ket: '' });
     render();
 
@@ -797,7 +773,7 @@
       (teks) => proses(teks, true), () => {})
       .then(() => {
         scannerJalan = true; $('pesanKamera').hidden = true; $('kamera').classList.add('aktif');
-        if (menunggu) jedaKamera(true);                 // kamera baru menyala saat masih menunggu kelengkapan
+        if (menunggu) jedaKamera(true);
       })
       .catch((err) => {
         $('pesanKamera').hidden = false;
@@ -834,7 +810,7 @@
     if (simpan) simpanLokal('cara', m);
     $('kamera').hidden = m !== 'kamera';
     $('panelAlat').hidden = m !== 'alat';
-    $('formManual').hidden = m !== 'ketik';       // kolom ketik hanya tampil di mode Ketik manual
+    $('formManual').hidden = m !== 'ketik';
     if (m !== 'kamera') hentikanScanner();
     pesan('');
     if (m === 'ketik') $('manual').focus();
@@ -851,7 +827,6 @@
   };
   const tutupModal = () => { $('modalCara').hidden = true; };
 
-  // Pilihan 1: Kamera. Dipanggil dari ketukan tombol, sehingga browser boleh menampilkan pop-up izin
   $('mKamera').addEventListener('click', async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       $('btnFoto').hidden = false;
@@ -861,44 +836,37 @@
       (await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })).getTracks().forEach((t) => t.stop());
     } catch (err) { $('btnFoto').hidden = false; return bukaModal(pesanError(err), true); }
     tutupModal();
-    setCara('kamera', true);     // tampilkan area kamera dulu, baru mulai
+    setCara('kamera', true);
     mulaiScanner();
   });
 
-  // Pilihan 2: Alat scanner USB
   $('mAlat').addEventListener('click', () => { tutupModal(); setCara('alat', true); pesan('Alat scanner siap. Arahkan ke barcode dan tekan pemicu.', 'ok'); });
-
-  // Pilihan 3: Ketik manual
   $('mKetik').addEventListener('click', () => { tutupModal(); setCara('ketik', true); });
-
   $('mTutup').addEventListener('click', tutupModal);
   $('btnCara').addEventListener('click', () => bukaModal());
   $('kamera').addEventListener('click', () => { if (!scannerJalan) bukaModal(); });
 
   // ---- Alat scanner USB (bekerja seperti keyboard: ketik cepat lalu Enter) ----
-  // Ditangkap di mana saja, tanpa perlu klik kolom input. Kalau terdeteksi dari cara lain, cara otomatis pindah ke alat.
   let buf = '', tMulai = 0, tBuf = 0;
   document.addEventListener('keydown', (e) => {
-    if (e.target === $('manual') || e.ctrlKey || e.metaKey || e.altKey) return;   // kolom input ditangani form di atas
-    // Kolom tanggal: cegah huruf/angka dari alat scanner mengubah tanggal yang sudah dipilih (kalender tetap bisa dipakai)
+    if (e.target === $('manual') || e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.target === $('tanggal') && e.key.length === 1) e.preventDefault();
     const now = Date.now();
     const jeda = now - tBuf;
-    // Pintasan 1-4 hanya berlaku untuk tekanan tunggal. Angka di dalam barcode dari alat scanner datang beruntun
-    // (jeda pendek sebelum dan sesudahnya), jadi ditunda sebentar dan dibatalkan kalau ada tombol lain menyusul.
+    // Pintasan 1-4 hanya untuk tekanan tunggal; angka dalam barcode alat datang beruntun, jadi ditunda dan dibatalkan bila ada tombol lain menyusul.
     clearTimeout(timerPintas);
     if (menunggu && $('modalCara').hidden && jeda > 150) {
       const billing = menunggu.tahap === 'billing';
       const pilih = billing ? PINTAS_KAT[e.key] : menunggu.tahap === 'absolute' ? PINTAS[e.key] : null;
       if (pilih) timerPintas = setTimeout(() => (billing ? pilihKategori(pilih) : pilihKelengkapan(pilih)), 160);
     }
-    if (jeda > 150) { buf = ''; tMulai = now; fotoSebelum = fotoBatal(); }   // jeda panjang = ketikan manusia
+    if (jeda > 150) { buf = ''; tMulai = now; fotoSebelum = fotoBatal(); }
     tBuf = now;
     if (e.key === 'Enter') {
       const rata = buf.length ? (now - tMulai) / buf.length : 999;
-      if (buf.length >= 6 && rata < 60) {               // cepat = alat, bukan manusia
-        e.preventDefault();                              // juga mencegah Enter menekan tombol yang sedang fokus
-        pulihBatal(fotoSebelum);                         // buang ketikan alat dari kolom form yang sedang fokus
+      if (buf.length >= 6 && rata < 60) {
+        e.preventDefault();
+        pulihBatal(fotoSebelum);
         tutupModal();
         if (cara !== 'alat') setCara('alat', true);
         proses(buf);
@@ -926,11 +894,11 @@
     segarkanTanggal();
     setTahap(tahap);
     renderMenunggu();
-    isiDriver([]);
+    isiDriver(DRIVER_AWAL);
     segarkanTanggalBatal();
     $('formManual').hidden = cara !== 'ketik';
     $('btnSuara').textContent = suaraNyala ? 'Suara: nyala' : 'Suara: mati';
-    bukaModal();       // pop-up pilihan cara scan selalu tampil saat halaman dibuka
+    bukaModal();
     ambilNama();
     bilasAntrean();
     muatDriver();

@@ -679,10 +679,11 @@
       const ada = daftar.find(sama('sendback', pm));
       if (ada && bisaHapus(ada)) daftar.splice(daftar.indexOf(ada), 1);
       const namaDriver = driver === LAINNYA ? lain.toUpperCase() : driver;
-      daftar.unshift({ kode: pm, tahap: 'sendback', status: 'ok',
-        ket: namaDriver + ', ' + ket + ', ' + items.length + ' barang, ' + fotoBaru.length + ' foto, ' + fmtTgl(tanggal) });
+      const adaToko = !!res.toko;
+      daftar.unshift({ kode: pm, tahap: 'sendback', status: adaToko ? 'ok' : 'periksa',
+        ket: (adaToko ? res.toko + ', ' : 'Tersimpan, tetapi nomor ini tidak ada di Master Data (nama toko kosong). Periksa nomornya. ') + namaDriver + ', ' + ket + ', ' + items.length + ' barang, ' + fotoBaru.length + ' foto, ' + fmtTgl(tanggal) });
       render();
-      bunyi('sukses');
+      bunyi(adaToko ? 'sukses' : 'peringatan');
       resetFormSend();
       pesan(res.message || 'Sendback tersimpan.', 'ok');
     } catch (e) {

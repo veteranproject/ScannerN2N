@@ -84,6 +84,7 @@
     .garis { position:absolute; left:6%; right:6%; top:50%; height:2px; opacity:0; pointer-events:none; background:#d9ccf5; box-shadow:0 0 8px var(--p-300); }
     #kamera.kedip, #panelAlat.kedip { box-shadow:inset 0 0 0 4px var(--p-300); }
     #kamera.aktif .garis { opacity:1; animation:sapu 1.8s ease-in-out infinite alternate; }
+    #kamera.aktif.jeda .garis { opacity:0; animation:none; }
     @keyframes sapu { from { top:22%; } to { top:78%; } }
     @media (prefers-reduced-motion: reduce) { #kamera.aktif .garis { animation:none; } }
 
@@ -200,7 +201,7 @@
       <button type="button" class="cek" data-k="semua" aria-pressed="false">Lengkap semua</button>
       <button type="button" class="cek" data-k="tidak" aria-pressed="false">Tidak lengkap</button>
     </div>
-    <p class="catatan">Urutan: scan nomor DO dulu, baru ketuk kelengkapan dokumen. Data dikirim ke sheet setelah kelengkapan dipilih. Pintasan keyboard: 1 = hanya Surat Jalan, 2 = hanya TTD &amp; Stempel, 3 = keduanya lengkap, 4 = tidak lengkap. Dokumen yang tidak dipilih dibiarkan kosong (tidak tercentang) di sheet, begitu juga Diterima Absolute. Tidak lengkap mengosongkan Surat Jalan dan TTD &amp; Stempel. Nomor yang masih kurang boleh discan ulang dan dilengkapi.</p>
+    <p class="catatan">Urutan: scan nomor DO dulu, baru ketuk kelengkapan dokumen. Selama menunggu pilihan, kamera berhenti membaca barcode, dan data dikirim ke sheet setelah kelengkapan dipilih. Pintasan keyboard: 1 = hanya Surat Jalan, 2 = hanya TTD &amp; Stempel, 3 = keduanya lengkap, 4 = tidak lengkap. Dokumen yang tidak dipilih dibiarkan kosong (tidak tercentang) di sheet, begitu juga Diterima Absolute. Tidak lengkap mengosongkan Surat Jalan dan TTD &amp; Stempel. Nomor yang sama boleh discan ulang kapan saja untuk memperbarui kelengkapan. Kalau sudah lengkap sebelumnya, hasilnya "Sudah lengkap" dan data lama tidak ditimpa.</p>
   </div>
 
   <div class="card">
@@ -230,7 +231,12 @@
   const TEKS_MODAL = 'Pilih salah satu. Pilihan bisa diganti kapan saja lewat tombol Ganti cara scan.';
   let daftar = [];          // hasil scan sesi ini, terbaru di atas: {kode, status, ket}
   let scanner = null, scannerJalan = false;
-  let kunciTerakhir = '', waktuTerakhir = 0;
+  // Pengaman pembacaan ganda. Kamera membaca barcode puluhan kali per detik selama masih di depan lensa,
+  // jadi barcode yang sama baru dianggap scan baru setelah sempat menghilang dari kamera (JEDA_LEPAS).
+  // Alat scanner USB dan ketik manual hanya diberi jeda pendek (JEDA_SAMA) supaya scan ulang yang disengaja tetap bisa.
+  const JEDA_LEPAS = 2000, JEDA_SAMA = 1000;
+  let kunciTerlihat = '', waktuTerlihat = 0;   // barcode terakhir yang terbaca kamera
+  let kunciTerakhir = '', waktuTerakhir = 0;   // scan terakhir dari alat/ketik/foto
 
   // ---- Penyimpanan lokal dan nama petugas ----
   const simpanLokal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -269,6 +275,8 @@
     $('tBill').setAttribute('aria-pressed', String(t === 'billing'));
     $('panelCek').hidden = t !== 'absolute';
     $('panelBilling').hidden = t !== 'billing';
+    // Pindah dari Absolute saat masih menunggu kelengkapan: batalkan, supaya kamera tidak tertahan di tab lain
+    if (t !== 'absolute' && menunggu) { menunggu = null; renderMenunggu(); }
     if (t === 'billing') segarkanTanggal();
     render();
     pesan('');
@@ -279,25 +287,38 @@
 
   // ---- Absolute Balik: scan dulu, baru pilih kelengkapan dokumen ----
   // Scan hanya menahan nomor di "menunggu". Nomor baru dikirim setelah salah satu tombol kelengkapan diketuk.
+  // Selama menunggu, kamera dijeda dan semua pembacaan barcode diabaikan.
   let menunggu = null;   // {kode, waktu}
   const PILIHAN = { sj: { sj: true }, ttd: { ttd: true }, semua: { sj: true, ttd: true }, tidak: { tidak: true } };
   // Pintasan keyboard (angka atas maupun numpad): 1 = Surat Jalan, 2 = TTD & Stempel, 3 = keduanya, 4 = tidak lengkap
   const PINTAS = { '1': PILIHAN.sj, '2': PILIHAN.ttd, '3': PILIHAN.semua, '4': PILIHAN.tidak };
   let timerPintas = null;
 
+  // Jeda / lanjutkan kamera. Aman dipanggil kapan saja: kalau kamera tidak sedang jalan, tidak terjadi apa-apa.
+  function jedaKamera(jeda) {
+    if (!scannerJalan || !scanner) return;
+    try { if (jeda) scanner.pause(true); else scanner.resume(); } catch (e) {}
+    $('kamera').classList.toggle('jeda', jeda);
+    $('pesanKamera').hidden = !jeda;
+    if (jeda) $('pesanKamera').textContent = 'Pilih kelengkapan dokumen dulu';
+  }
+
   function renderMenunggu() {
     $('menunggu').hidden = !menunggu;
     $('petunjukScan').hidden = !!menunggu;
     $('menungguKode').textContent = menunggu ? menunggu.kode : '';
+    jedaKamera(!!menunggu);
   }
 
   function pilihKelengkapan(p) {
     if (!menunggu) return false;
     const kode = menunggu.kode, waktu = menunggu.waktu;
     menunggu = null;
-    renderMenunggu();
+    // Nomor yang barusan diproses tidak langsung terbaca lagi kalau barcodenya masih di depan kamera
+    kunciTerlihat = 'absolute|' + kode.toUpperCase(); waktuTerlihat = Date.now();
+    renderMenunggu();                                   // kamera lanjut membaca
     const ada = daftar.find(sama('absolute', kode));
-    if (ada) daftar.splice(daftar.indexOf(ada), 1);     // sisa hasil 'kurang' sebelumnya diganti
+    if (ada && bisaHapus(ada)) daftar.splice(daftar.indexOf(ada), 1);   // hasil lama diganti hasil terbaru
     daftar.unshift({ kode: kode, tahap: 'absolute', status: 'proses', ket: '' });
     render();
     antrean.push({ kode: kode, waktu: waktu, tahap: 'absolute', cek: { sj: !!p.sj, ttd: !!p.ttd, tidak: !!p.tidak } });
@@ -409,14 +430,14 @@
     }
   }
 
-  // Hapus hasil di tab aktif saja, supaya nomornya bisa discan ulang. Data di spreadsheet tidak ikut terhapus.
+  // Hapus hasil di tab aktif saja. Data di spreadsheet tidak ikut terhapus.
   $('btnHapus').addEventListener('click', () => {
     const t = tahap;
     const hapusan = daftar.filter((d) => (d.tahap || 'storeman') === t && bisaHapus(d));
     if (!hapusan.length) return;
     if (!confirm('Hapus ' + hapusan.length + ' hasil scan di ' + NAMA_TAHAP[t] + '?\nData yang sudah masuk ke spreadsheet tidak ikut terhapus.')) return;
     daftar = daftar.filter((d) => !hapusan.includes(d));
-    kunciTerakhir = '';
+    kunciTerakhir = ''; kunciTerlihat = '';
     render();
     pesan('');
   });
@@ -539,8 +560,8 @@
   }
   $('btnSuara').addEventListener('click', () => setSuara(!suaraNyala));
 
-  // Penolakan lokal (duplikat, tanggal/kategori kosong): bunyi galat hanya sekali per nomor,
-  // supaya barcode yang masih di depan kamera tidak membunyikan alarm tiap 3 detik.
+  // Penolakan lokal (tanggal/kategori kosong, masih diproses): bunyi galat hanya sekali per kunci,
+  // supaya barcode yang masih di depan kamera tidak membunyikan alarm terus-menerus.
   let galatKunci = '', galatWaktu = 0;
   function tolak(teks, kunci) {
     pesan(teks, 'err');
@@ -558,9 +579,18 @@
   }
 
   // ---- Memproses nomor DO ----
-  function proses(teks) {
+  // dariKamera = true bila nomor datang dari pembacaan kamera (bukan alat USB, ketik, atau foto).
+  function proses(teks, dariKamera) {
     const kode = String(teks).trim();
     if (!kode) return;
+
+    // Absolute: selama menunggu kelengkapan dokumen, kamera tidak menangkap apa pun.
+    // Alat USB dan ketik manual tetap diberi tahu kenapa ditolak.
+    if (tahap === 'absolute' && menunggu) {
+      if (dariKamera) return;
+      if (menunggu.kode.toUpperCase() === kode.toUpperCase()) return;
+      return tolak('Pilih kelengkapan untuk ' + menunggu.kode + ' dulu (atau ketuk Batal) sebelum scan nomor berikutnya.', 'menunggu');
+    }
 
     // Billing: tanggal dan kategori wajib dipilih dulu. Nilainya diambil saat scan, bukan saat antrean terkirim.
     let tanggalIso = '', kat = '';
@@ -571,32 +601,34 @@
       if (!kat) return tolak('Pilih kategori dulu sebelum scan Billing.', 'pilihan');
     }
 
-    // Absolute: nomor ditahan dulu, dikirim setelah kelengkapan dokumen dipilih
-    if (tahap === 'absolute' && menunggu) {
-      if (menunggu.kode.toUpperCase() === kode.toUpperCase()) return;   // barcode yang sama masih di depan kamera
-      return tolak('Pilih kelengkapan untuk ' + menunggu.kode + ' dulu (atau ketuk Batal) sebelum scan nomor berikutnya.', 'menunggu');
-    }
-
+    // Pengaman pembacaan ganda (lihat JEDA_LEPAS dan JEDA_SAMA). Scan ulang nomor yang sama diperbolehkan.
     const sekarang = Date.now();
     const kunci = tahap + '|' + kode.toUpperCase();
-    if (kunci === kunciTerakhir && sekarang - waktuTerakhir < 3000) return;   // barcode yang sama masih di depan kamera
-    kunciTerakhir = kunci; waktuTerakhir = sekarang;
+    if (dariKamera) {
+      const masihDiDepan = kunci === kunciTerlihat && sekarang - waktuTerlihat < JEDA_LEPAS;
+      kunciTerlihat = kunci; waktuTerlihat = sekarang;
+      if (masihDiDepan) return;
+    } else {
+      if (kunci === kunciTerakhir && sekarang - waktuTerakhir < JEDA_SAMA) return;
+      kunciTerakhir = kunci; waktuTerakhir = sekarang;
+    }
 
-    // Nomor yang sudah discan ditolak, kecuali yang belum lengkap (boleh discan ulang)
+    // Nomor yang sama masih dalam proses kirim: tunggu hasilnya dulu, lalu boleh discan ulang
     const ada = daftar.find(sama(tahap, kode));
-    if (ada && ada.status !== 'kurang') return tolak(kode + ' sudah discan (' + NAMA_TAHAP[tahap] + ') pada sesi ini.', kunci);
-    if (ada && tahap !== 'absolute') daftar.splice(daftar.indexOf(ada), 1);
+    if (ada && !bisaHapus(ada)) return tolak(kode + ' masih diproses. Tunggu hasilnya, lalu scan ulang.', kunci);
+
+    tandaScan();
 
     if (tahap === 'absolute') {
-      tandaScan();
       menunggu = { kode: kode, waktu: sekarang };
-      renderMenunggu();
-      pesan('Nomor ' + kode + ' discan. Pilih kelengkapan dokumen.', 'ok');
+      renderMenunggu();                                  // kamera dijeda
+      pesan(ada ? 'Nomor ' + kode + ' discan ulang. Pilih kelengkapan dokumen.' : 'Nomor ' + kode + ' discan. Pilih kelengkapan dokumen.', 'ok');
+      try { $('panelCek').scrollIntoView({ block: 'nearest' }); } catch (e) {}
       return;
     }
 
-    tandaScan();
     pesan('');
+    if (ada) daftar.splice(daftar.indexOf(ada), 1);      // hasil lama diganti hasil scan terbaru
     daftar.unshift({ kode: kode, tahap: tahap, status: 'proses', ket: tahap === 'billing' ? kat + ', ' + fmtTgl(tanggalIso) : '' });
     render();
 
@@ -605,7 +637,6 @@
     antrean.push(butir);
     simpanAntrean();
     bilasAntrean();
-
   }
 
   $('formManual').addEventListener('submit', (e) => {
@@ -628,8 +659,11 @@
     if (!window.Html5Qrcode) { $('pesanKamera').hidden = false; $('pesanKamera').textContent = 'Library scanner gagal dimuat. Periksa koneksi internet.'; return; }
     buatScanner().start({ facingMode: 'environment' },
       { fps: 15, qrbox: (w, h) => ({ width: Math.floor(w * 0.92), height: Math.max(60, Math.floor(h * 0.8)) }) },
-      proses, () => {})
-      .then(() => { scannerJalan = true; $('pesanKamera').hidden = true; $('kamera').classList.add('aktif'); })
+      (teks) => proses(teks, true), () => {})
+      .then(() => {
+        scannerJalan = true; $('pesanKamera').hidden = true; $('kamera').classList.add('aktif');
+        if (menunggu) jedaKamera(true);                 // kamera baru menyala saat masih menunggu kelengkapan
+      })
       .catch((err) => {
         $('pesanKamera').hidden = false;
         $('pesanKamera').textContent = 'Kamera langsung tidak bisa diakses (' + String(err) + '). Gunakan Foto barcode atau ketik nomor.';
@@ -642,7 +676,7 @@
     if (!scannerJalan || !scanner) return;
     scannerJalan = false;
     scanner.stop().then(() => {
-      $('kamera').classList.remove('aktif');
+      $('kamera').classList.remove('aktif', 'jeda');
       $('pesanKamera').hidden = false;
       $('pesanKamera').textContent = 'Ketuk di sini untuk mengaktifkan kamera';
     }).catch(() => {});

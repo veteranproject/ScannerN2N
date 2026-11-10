@@ -851,6 +851,7 @@
       });
       render();
       bunyiHasil(res.hasil);
+      if (res.peringatan) pesan(res.peringatan, 'err');
       return true;
     } catch (e) {
       tandaiAntre(grup, 'Tidak ada sinyal. Dikirim otomatis nanti.');
